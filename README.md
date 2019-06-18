@@ -1,2 +1,10 @@
 # icfpc2019
-ICFP programming contest 2019 entry
+
+Team "" ICFP programming contest 2019 entry.
+
+Team members:
+
+- Christoph Breitkopf <chbreitkopf@gmail.com>
+- Jan Dreske <jandreske@web.de>
+- Daniel Kauke <>
+

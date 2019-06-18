@@ -6,5 +6,5 @@ Team members:
 
 - Christoph Breitkopf <chbreitkopf@gmail.com>
 - Jan Dreske <jandreske@web.de>
-- Daniel Kauke <>
+- Daniel Kauke <daniel.kauke@gmx.de>
 

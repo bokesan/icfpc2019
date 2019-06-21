@@ -54,7 +54,11 @@ public class State {
     }
 
     public void move(List<Point> path) {
-        for (Point point : path) move(point);
+        Point last = path.get(path.size() - 1);
+        for (Point point : path) {
+            if (!toVisit.contains(last)) break;
+            move(point);
+        }
     }
 
     public void move(Point point) {

@@ -15,18 +15,26 @@ enum Actions{
     L, //use drill
     B // extend new arm
 }
+enum Direction{
+    NORTH,
+    EAST,
+    WEST,
+    SOUTH    
+}
 public class Robot{
     Point position;
+    Direction direction;
     List<Point> Manipulators;
     public Robot(Point position) {
         this.position = position;
         Manipulators = new LinkedList<>();        
+        direction = Direction.EAST;        
         initBaseManipulators();
     }
     private void initBaseManipulators(){
         extendManipulators(Point.of(position.getX()+1, position.getY()));
         extendManipulators(Point.of(position.getX()+1, position.getY()+1));
-        extendManipulators(Point.of(position.getX(), position.getY()+1));
+        extendManipulators(Point.of(position.getX()+1, position.getY()-1));
     }
 
     public void extendManipulators(Point manipulatorExtension){
@@ -59,24 +67,54 @@ public class Robot{
             case Q:
                 log(action); 
                 alignManipulators();
+                alignManipulators();
+                alignManipulators();
+                alignManipulators();
+                alignManipulators();
                 break;
             default:
                 break;
         }
     }
     private void alignManipulators(){
+        Direction manipulationWay = null;
+        List<Point> tempList = new LinkedList<>();
         for (Point point : Manipulators) {
+            
             System.out.println("old --- X:"+ point.getX() +" Y:" + point.getY());
 
             int xDifference = point.getX() - position.getX();
-            int yDifference = point.getY() - position.getY();
+            int yDifference = point.getY() - position.getY();            
+            int resX = 0;            
+            int resY = 0;   
 
-
-            System.out.println("xDif:"+xDifference);
-            System.out.println("yDif:"+yDifference);
-            point = Point.of(point.getX()-xDifference, point.getY()-yDifference);
-            System.out.println("new --- X:"+ point.getX() +" Y:" + point.getY());
+            switch(direction){
+                case NORTH:
+                    tempList.add(Point.of(position.getX() - yDifference, position.getY() - xDifference));
+                    manipulationWay = Direction.WEST;
+                    break;
+                case EAST:
+                    tempList.add(Point.of(position.getX() + yDifference, position.getY() + xDifference));
+                    manipulationWay = Direction.NORTH;
+                    break;
+                case WEST:
+                    tempList.add(Point.of(position.getX() + yDifference, position.getY() + xDifference));
+                    manipulationWay = Direction.SOUTH;
+                    break;
+                case SOUTH:
+                    tempList.add(Point.of(position.getX() -yDifference, position.getY() + xDifference));
+                    manipulationWay = Direction.EAST;
+                    break;
+            }            
         }   
+        if(manipulationWay != null){
+            direction = manipulationWay;         
+        }   
+        for (Point p : tempList) {
+            System.out.println("new--- X:"+ p.getX() +" Y:" + p.getY());
+        }
+        Manipulators = tempList;
+        System.out.println("DONE: " + direction);
     }
 
     public static class ExtensionException extends RuntimeException {

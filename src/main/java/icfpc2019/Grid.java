@@ -1,8 +1,5 @@
 package icfpc2019;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,39 +75,6 @@ public class Grid {
         return lines;
     }
 
-/*    private static void setSquares(boolean[][] fields, boolean isFree, List<Point> shape) {
-        OrthoPolygonDecomposer decomposer = new OrthoPolygonDecomposer();
-        Coordinate[] coordinates = new Coordinate[shape.size() + 1];
-        for (int i = 0; i < shape.size(); i++) {
-            coordinates[i] = new Coordinate(shape.get(i).getX(), shape.get(i).getY());
-        }
-        coordinates[shape.size()] = coordinates[0];
-        GeometryFactory factory = new GeometryFactory();
-        LinearRing shell = new LinearRing(new CoordinateArraySequence(coordinates, 2), factory);
-        Geometry poly = new Polygon(shell, null, factory);
-        List<Polygon> rectangles = decomposer.decompose(poly);
-
-        for (Polygon rectangle : rectangles) {
-            int minX = Integer.MAX_VALUE;
-            int minY = Integer.MAX_VALUE;
-            int maxX = 0;
-            int maxY = 0;
-            for (Coordinate coord : rectangle.getExteriorRing().getCoordinates()) {
-                int x = (int) coord.x;
-                int y = (int) coord.y;
-                minX = Math.min(minX, x);
-                maxX = Math.max(maxX, x);
-                minY = Math.min(minY, y);
-                maxY = Math.max(maxY, y);
-            }
-            for (int x = minX; x <= maxX; x++) {
-                for (int y = minY; y <= maxY; y++) {
-                    fields[x][y] = isFree;
-                }
-            }
-        }
-    }*/
-
     public boolean isFree(Point p) {
         if (p.getX() > max.getX() || p.getX() < min.getX() || p.getY() > max.getY() || p.getY() < min.getY()) {
             return false;
@@ -118,6 +82,7 @@ public class Grid {
             return fields[p.getX()][p.getY()];
         }
     }
+
     public boolean[][] getFields(){
         return fields;
     }

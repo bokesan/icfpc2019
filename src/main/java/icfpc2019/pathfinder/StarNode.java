@@ -8,7 +8,7 @@ public class StarNode {
     private StarNode previous;
     private int gCosts;
     private int hCosts;
-    private int movementPanelty = 0;
+    private int movementPenalty = 0;
     private boolean isWalkable;
 
     protected static final int BASICMOVEMENTCOST = 10;
@@ -31,7 +31,7 @@ public class StarNode {
                     + absolute(this.getYPosition() - starNode.getYPosition())) * BASICMOVEMENTCOST;
     }
     private void setgCosts(int gCosts) {
-        this.gCosts = gCosts + movementPanelty;        
+        this.gCosts = gCosts + movementPenalty;        
     }
     public void setgCosts(StarNode previousNode, int basicCost) {
         setgCosts(previousNode.getgCosts() + basicCost);
@@ -40,7 +40,7 @@ public class StarNode {
         setgCosts(previousNode, BASICMOVEMENTCOST);
     }
     public void setMovementPanelty(int movementPanelty) {
-        this.movementPanelty = movementPanelty;
+        this.movementPenalty = movementPanelty;
     }
     public void setIsWalkable(boolean isWalkable){
         this.isWalkable = isWalkable;
@@ -53,7 +53,7 @@ public class StarNode {
     }
 
 	public int calculategCosts(StarNode current) {
-		return current.getgCosts() + BASICMOVEMENTCOST + movementPanelty;
+		return current.getgCosts() + BASICMOVEMENTCOST + movementPenalty;
 	}
 	public StarNode getPrevious() {
 		return previous;

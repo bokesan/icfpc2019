@@ -41,16 +41,24 @@ public class Robot {
     }    
 
     public void move(Point newPosition){
-        if((newPosition.getX() < position.getX()) && position.getY() == newPosition.getY())
-              log(Actions.A);
-        else if((newPosition.getX() > position.getX()) && position.getY() == newPosition.getY())
-              log(Actions.D);
-        else if((newPosition.getY() > position.getY()) && position.getX() == newPosition.getX())
-              log(Actions.W);
-        else if((newPosition.getY() < position.getY()) && position.getX() == newPosition.getX())
-              log(Actions.S);        
+        move(newPosition, true);
+    }
+    public void move(Point newPosition, boolean loggingActive){       
+
+        if(loggingActive){
+            
+            if((newPosition.getX() < position.getX()) && position.getY() == newPosition.getY())
+                  log(Actions.A);
+            else if((newPosition.getX() > position.getX()) && position.getY() == newPosition.getY())
+                  log(Actions.D);
+            else if((newPosition.getY() > position.getY()) && position.getX() == newPosition.getX())
+                  log(Actions.W);
+            else if((newPosition.getY() < position.getY()) && position.getX() == newPosition.getX())
+                  log(Actions.S);        
+            
+            countTimeUnit();
+        }
         position = newPosition;
-        countTimeUnit();
     }
     private void countTimeUnit(){
         if(drillUnits > 0)

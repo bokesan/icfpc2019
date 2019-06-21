@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 public class App {
@@ -35,10 +36,27 @@ public class App {
         Pathfinder finder = new Pathfinder();
         finder.initNodes(grid);
 
-//        List<StarNode> nodes = finder.findPath(problem.getInitialWorkerLocation(), Point.of(problem.getInitialWorkerLocation().getX() + 24, problem.getInitialWorkerLocation().getY()));
-//        for (StarNode node : nodes) {
-//            System.out.println(node);
-//        }
+        Robot robot = new Robot(problem.getInitialWorkerLocation());
+
+        State state = new State(grid, robot, problem.getBoosters());
+
+        while (!state.mapFinished()) {
+            Point next = state.getNextPointToVisit();
+            List<StarNode> starPath = finder.findPath(state.getCurrentPosition(), next);
+            List<Point> path = pathFromStarNodes(starPath);
+            state.move(path.get(0));
+        }
+
+        System.out.println("Wrapping finished!");
+        System.out.println(state.getResult());
+    }
+
+    private static List<Point> pathFromStarNodes(List<StarNode> starPath) {
+        List<Point> path = new ArrayList<>();
+        for (StarNode star : starPath) {
+            path.add(Point.of(star.getXPosition(), star.getYPosition()));
+        }
+        return path;
     }
 
     private static String readFile(String path, Charset encoding) throws IOException {

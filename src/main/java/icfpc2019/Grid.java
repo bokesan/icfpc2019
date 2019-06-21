@@ -6,8 +6,8 @@ import java.util.List;
 public class Grid {
 
     private final boolean[][] fields;
-    private final Point min;
-    private final Point max;
+    public final Point min;
+    public final Point max;
 
     private Grid(boolean[][] fields, Point min, Point max) {
         this.fields = fields;

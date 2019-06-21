@@ -3,24 +3,15 @@ package icfpc2019;
 import java.util.LinkedList;
 import java.util.List;
 
-enum Actions{
-    W, //move up
-    A, //move left
-    S, //move down
-    D, //move right
-    Z, //do nothing
-    E, //turn 90° clockwise
-    Q, //turn 90° anti-clockwise
-    F, //attach fast wheel
-    L, //use drill
-    B // extend new arm
-}
-public class Robot{
+public class Robot {
+
     Point position;
-    List<Point> Manipulators;
+    private List<Point> manipulators;
+    private StringBuilder log = new StringBuilder();
+
     public Robot(Point position) {
         this.position = position;
-        Manipulators = new LinkedList<>();        
+        manipulators = new LinkedList<>();
         initBaseManipulators();
     }
     private void initBaseManipulators(){
@@ -30,9 +21,9 @@ public class Robot{
     }
 
     public void extendManipulators(Point manipulatorExtension){
-        if(Manipulators.contains(manipulatorExtension))
+        if(manipulators.contains(manipulatorExtension))
                 throw new ExtensionException("Already extended");
-        Manipulators.add(manipulatorExtension);
+        manipulators.add(manipulatorExtension);
     }    
 
     public void move(Point newPosition){
@@ -46,8 +37,9 @@ public class Robot{
               log(Actions.S);
         position = newPosition;
     }
-    private void log(Actions action){
 
+    private void log(Actions action) {
+        log.append(action.toString());
     }
 
     public void spin(Actions action) {
@@ -64,8 +56,9 @@ public class Robot{
                 break;
         }
     }
+
     private void alignManipulators(){
-        for (Point point : Manipulators) {
+        for (Point point : manipulators) {
             System.out.println("old --- X:"+ point.getX() +" Y:" + point.getY());
 
             int xDifference = point.getX() - position.getX();
@@ -77,6 +70,14 @@ public class Robot{
             point = Point.of(point.getX()-xDifference, point.getY()-yDifference);
             System.out.println("new --- X:"+ point.getX() +" Y:" + point.getY());
         }   
+    }
+
+    public String getActionLog() {
+        return log.toString();
+    }
+
+    public List<Point> getManipulators() {
+        return manipulators;
     }
 
     public static class ExtensionException extends RuntimeException {

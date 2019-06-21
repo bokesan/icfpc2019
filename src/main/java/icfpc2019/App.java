@@ -3,14 +3,28 @@
  */
 package icfpc2019;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 public class App {
 
-    public String getGreeting() {
-        return "Hello world.";
+    public static void main(String[] args) throws IOException {
+        if (args.length == 0) {
+            System.err.println("usage: solver problem-file");
+            System.exit(1);
+        }
+
+        String desc = readFile(args[0], StandardCharsets.UTF_8);
+        ProblemDesc problem = ProblemDesc.of(desc);
+
+        System.out.println("Problem description successfully read!");
     }
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+    private static String readFile(String path, Charset encoding) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
     }
-
 }

@@ -18,5 +18,9 @@ for example:
 
     ./gradlew run --args='--file="foo.json" --solver=best --who-rules=we'
 
+or
+
+    ./gradlew run --args=$HOME/Dropbox/ICFP/2019/task/part-1/prob-001.desc
+
 To build a distribution archive use `./gradlew distZip`. The resulting archive
 is placed in `build/distributions`.

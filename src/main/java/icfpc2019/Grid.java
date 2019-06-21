@@ -15,7 +15,7 @@ public class Grid {
     }
 
     public Grid of(ProblemDesc problemDesc) {
-        boolean[][] fields = new boolean[problemDesc.getMax().getX()][problemDesc.getMax().getY()];
+        boolean[][] fields = new boolean[problemDesc.getMax().getX() + 1][problemDesc.getMax().getY() + 1];
         setSquares(fields, true, problemDesc.getMap());
         for (List<Point> shape : problemDesc.getObstacles()) {
             setSquares(fields, false, shape);

@@ -6,6 +6,8 @@ package icfpc2019;
 import icfpc2019.pathfinder.Pathfinder;
 import icfpc2019.pathfinder.StarNode;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -44,11 +46,22 @@ public class App {
             Point next = state.getNextPointToVisit();
             List<StarNode> starPath = finder.findPath(state.getCurrentPosition(), next);
             List<Point> path = pathFromStarNodes(starPath);
-            state.move(path.get(0));
+            state.move(path);
         }
 
         System.out.println("Wrapping finished!");
-        System.out.println(state.getResult());
+        System.out.println("Solution length: " + state.getResult().length());
+
+        if (args.length > 1) {
+            writeFile(args[1], state.getResult());
+            System.out.println("Solution written to: " + args[1]);
+        }
+    }
+
+    private static void writeFile(String path, String content) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+        writer.write(content);
+        writer.close();
     }
 
     private static List<Point> pathFromStarNodes(List<StarNode> starPath) {

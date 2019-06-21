@@ -3,11 +3,15 @@
  */
 package icfpc2019;
 
+import icfpc2019.pathfinder.Pathfinder;
+import icfpc2019.pathfinder.StarNode;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class App {
 
@@ -27,6 +31,14 @@ public class App {
         System.out.println("Grid created!");
 
         //System.out.println(grid.toString());
+
+        Pathfinder finder = new Pathfinder();
+        finder.initNodes(grid);
+
+//        List<StarNode> nodes = finder.findPath(problem.getInitialWorkerLocation(), Point.of(problem.getInitialWorkerLocation().getX() + 24, problem.getInitialWorkerLocation().getY()));
+//        for (StarNode node : nodes) {
+//            System.out.println(node);
+//        }
     }
 
     private static String readFile(String path, Charset encoding) throws IOException {

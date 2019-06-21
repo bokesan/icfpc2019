@@ -58,6 +58,21 @@ public class State {
     }
 
     public void move(Point point) {
+        if (robot.direction == Direction.EAST || robot.direction == Direction.WEST) {
+            //we are facing left or right and want to turn if we gonna move up or down
+            if (point.getY() > robot.position.getY()) {
+                turn(robot.direction == Direction.EAST);
+            } else if (point.getY() < robot.position.getY()) {
+                turn(robot.direction == Direction.WEST);
+            }
+        } else {
+            //we are facing up or down and want to turn if we gonna move left or right
+            if (point.getX() > robot.position.getX()) {
+                turn(robot.direction == Direction.SOUTH);
+            } else if (point.getX() < robot.position.getX()) {
+                turn(robot.direction == Direction.NORTH);
+            }
+        }
         robot.move(point);
         removePointsToVisit();
     }
@@ -72,5 +87,14 @@ public class State {
 
     public Point getCurrentPosition() {
         return robot.position;
+    }
+
+    public void turn(boolean left) {
+        if (left) {
+            robot.spin(Actions.Q);
+        } else {
+            robot.spin(Actions.E);
+        }
+        removePointsToVisit();
     }
 }

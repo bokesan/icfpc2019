@@ -14,7 +14,8 @@ public class Point {
 
     public static Point of(int x, int y) {
         if (x < 0 || y < 0) {
-            throw new IllegalArgumentException("invalid point: " + x + "," + y);
+            //We need to track manipulators "outside" the grid, so negative coordinates can happen
+            //throw new IllegalArgumentException("invalid point: " + x + "," + y);
         }
         return new Point(x, y);
     }

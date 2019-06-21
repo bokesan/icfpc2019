@@ -1,16 +1,11 @@
 package icfpc2019;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 
 public class Robot {
-    private enum Direction{
-        NORTH,
-        EAST,
-        WEST,
-        SOUTH    
-    }
 
     Point position;
     Direction direction;
@@ -47,19 +42,33 @@ public class Robot {
 
         if(loggingActive){
             
-            if((newPosition.getX() < position.getX()) && position.getY() == newPosition.getY())
-                  log(Actions.A);
-            else if((newPosition.getX() > position.getX()) && position.getY() == newPosition.getY())
-                  log(Actions.D);
-            else if((newPosition.getY() > position.getY()) && position.getX() == newPosition.getX())
-                  log(Actions.W);
-            else if((newPosition.getY() < position.getY()) && position.getX() == newPosition.getX())
-                  log(Actions.S);        
+            if((newPosition.getX() < position.getX()) && position.getY() == newPosition.getY()) {
+                log(Actions.A);
+                moveManipulators(-1, 0);
+            } else if((newPosition.getX() > position.getX()) && position.getY() == newPosition.getY()) {
+                log(Actions.D);
+                moveManipulators(1, 0);
+            } else if((newPosition.getY() > position.getY()) && position.getX() == newPosition.getX()) {
+                log(Actions.W);
+                moveManipulators(0, 1);
+            } else if((newPosition.getY() < position.getY()) && position.getX() == newPosition.getX()) {
+                log(Actions.S);
+                moveManipulators(0, -1);
+            }
             
             countTimeUnit();
         }
         position = newPosition;
     }
+
+    private void moveManipulators(int x, int y) {
+        List<Point> newManipulators = new ArrayList<>();
+        for (Point p : manipulators) {
+            newManipulators.add(Point.of(p.getX() + x, p.getY() + y));
+        }
+        manipulators = newManipulators;
+    }
+
     private void countTimeUnit(){
         if(drillUnits > 0)
             drillUnits -= 1;
@@ -71,7 +80,7 @@ public class Robot {
         log.append(action.toString());
     }
     private void log(Actions action, Point target){
-        log.append(action.toString()+"("+target.getX()+","+target.getY()+")");
+        log.append(action.toString()).append("(").append(target.getX()).append(",").append(target.getY()).append(")");
     }
 
     public void spin(Actions action) {
@@ -130,29 +139,24 @@ public class Robot {
         List<Point> tempList = new LinkedList<>();
         for (Point point : manipulators) {
             int xDifference = point.getX() - position.getX();
-            int yDifference = point.getY() - position.getY(); 
-            switch(direction){
-                case NORTH:
-                    tempList.add(Point.of(position.getX() - yDifference, position.getY() - xDifference));
-                    manipulationWay = Direction.WEST;
-                    break;
-                case EAST:
-                    tempList.add(Point.of(position.getX() + yDifference, position.getY() + xDifference));
-                    manipulationWay = Direction.NORTH;
-                    break;
-                case WEST:
-                    tempList.add(Point.of(position.getX() + yDifference, position.getY() + xDifference));
-                    manipulationWay = Direction.SOUTH;
-                    break;
-                case SOUTH:
-                    tempList.add(Point.of(position.getX() -yDifference, position.getY() + xDifference));
-                    manipulationWay = Direction.EAST;
-                    break;
-            }            
-        }   
-        if(manipulationWay != null){
-            direction = manipulationWay;         
+            int yDifference = point.getY() - position.getY();
+            tempList.add(Point.of(position.getX() - yDifference, position.getY() + xDifference));
         }
+        switch(direction){
+            case NORTH:
+                manipulationWay = Direction.WEST;
+                break;
+            case EAST:
+                manipulationWay = Direction.NORTH;
+                break;
+            case WEST:
+                manipulationWay = Direction.SOUTH;
+                break;
+            case SOUTH:
+                manipulationWay = Direction.EAST;
+                break;
+        }
+        direction = manipulationWay;
         manipulators = tempList;
     }
 

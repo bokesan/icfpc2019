@@ -64,7 +64,11 @@ public class Robot{
         }
     }
     private void alignManipulators(){
-        
+     for (Point point : Manipulators) {
+         int xDifference = point.getX() - position.getX();
+         int yDifference = point.getY() - position.getY();
+                 
+     }   
     }
 
     public static class ExtensionException extends RuntimeException {

@@ -1,8 +1,6 @@
 package icfpc2019;
 
-import java.awt.Desktop.Action;
-import java.security.cert.Extension;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 enum Actions{
@@ -21,7 +19,8 @@ public class Robot{
     Point position;
     List<Point> Manipulators;
     public Robot(Point position) {
-        Manipulators = new ArrayList<Point>();        
+        this.position = position;
+        Manipulators = new LinkedList<>();        
         initBaseManipulators();
     }
     private void initBaseManipulators(){
@@ -33,7 +32,7 @@ public class Robot{
     public void extendManipulators(Point manipulatorExtension){
         if(Manipulators.contains(manipulatorExtension))
                 throw new ExtensionException("Already extended");
-                Manipulators.add(manipulatorExtension);
+        Manipulators.add(manipulatorExtension);
     }    
 
     public void move(Point newPosition){
@@ -43,7 +42,7 @@ public class Robot{
               log(Actions.D);
         else if((newPosition.getY() > position.getY()) && position.getX() == newPosition.getX())
               log(Actions.W);
-        else if((newPosition.getY() > position.getY()) && position.getX() == newPosition.getX())
+        else if((newPosition.getY() < position.getY()) && position.getX() == newPosition.getX())
               log(Actions.S);
         position = newPosition;
     }
@@ -55,20 +54,29 @@ public class Robot{
         switch(action){
             case E:
                 log(action);
+                alignManipulators();
                 break;
             case Q:
                 log(action); 
+                alignManipulators();
                 break;
             default:
                 break;
         }
     }
     private void alignManipulators(){
-     for (Point point : Manipulators) {
-         int xDifference = point.getX() - position.getX();
-         int yDifference = point.getY() - position.getY();
-                 
-     }   
+        for (Point point : Manipulators) {
+            System.out.println("old --- X:"+ point.getX() +" Y:" + point.getY());
+
+            int xDifference = point.getX() - position.getX();
+            int yDifference = point.getY() - position.getY();
+
+
+            System.out.println("xDif:"+xDifference);
+            System.out.println("yDif:"+yDifference);
+            point = Point.of(point.getX()-xDifference, point.getY()-yDifference);
+            System.out.println("new --- X:"+ point.getX() +" Y:" + point.getY());
+        }   
     }
 
     public static class ExtensionException extends RuntimeException {

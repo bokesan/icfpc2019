@@ -14,11 +14,17 @@ public class ProblemDesc {
 
     private final Point initialWorkerLocation;
 
-    private ProblemDesc(List<Point> map, List<List<Point>> obstacles, List<BoosterLocation> boosters, Point initialPos) {
+    private final Point min;
+
+    private final Point max;
+
+    private ProblemDesc(List<Point> map, List<List<Point>> obstacles, List<BoosterLocation> boosters, Point initialPos, Point min, Point max) {
         this.map = map;
         this.obstacles = obstacles;
         this.boosters = boosters;
         this.initialWorkerLocation = initialPos;
+        this.min = min;
+        this.max = max;
     }
 
     public static ProblemDesc of(String desc) {
@@ -42,11 +48,23 @@ public class ProblemDesc {
         return initialWorkerLocation;
     }
 
+    public Point getMin() {
+        return min;
+    }
+
+    public Point getMax() {
+        return max;
+    }
+
     private static class Parser {
 
         private final String s;
         private final int length;
         private int pos;
+        private int minX = Integer.MAX_VALUE;
+        private int minY = Integer.MAX_VALUE;
+        private int maxX = 0;
+        private int maxY = 0;
 
         Parser(String s) {
             this.s = s;
@@ -62,7 +80,7 @@ public class ProblemDesc {
             List<List<Point>> obstacles = parseObstacles();
             skip('#');
             List<BoosterLocation> boosters = parseBoosters();
-            return new ProblemDesc(map, obstacles, boosters, initial);
+            return new ProblemDesc(map, obstacles, boosters, initial, Point.of(minX, minY), Point.of(maxX, maxY));
         }
 
         private Point parsePoint() {
@@ -71,6 +89,10 @@ public class ProblemDesc {
             skip(',');
             int y = parseNat();
             skip(')');
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
             return Point.of(x, y);
         }
 

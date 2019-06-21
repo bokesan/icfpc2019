@@ -22,6 +22,21 @@ public class Grid {
         }
         return new Grid(fields, problemDesc.getMin(), problemDesc.getMax());
     }
+    public static Grid of(int xMax, int yMax, int xGapPosition,int yGapPosition){
+        
+        boolean[][] fields = new boolean[xMax][yMax];
+        for(int x = 0; x < xMax; x++){
+            for(int y = 0; y < yMax; y++){
+                if(x == xGapPosition && y != yGapPosition){
+                    fields[x][y] = false;
+                }else{
+                    fields[x][y] = true;
+                }
+                
+            }
+        }
+        return new Grid(fields, Point.of(0, 0), Point.of(xMax, yMax));
+    }
 
     private void setSquares(boolean[][] fields, boolean free, List<Point> shape) {
         //TODO
@@ -33,5 +48,8 @@ public class Grid {
         } else {
             return fields[p.getX()][p.getY()];
         }
+    }
+    public boolean[][] getFields(){
+        return fields;
     }
 }

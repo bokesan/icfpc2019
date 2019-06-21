@@ -3,33 +3,25 @@ package icfpc2019;
 import java.util.LinkedList;
 import java.util.List;
 
-enum Actions{
-    W, //move up
-    A, //move left
-    S, //move down
-    D, //move right
-    Z, //do nothing
-    E, //turn 90° clockwise
-    Q, //turn 90° anti-clockwise
-    F, //attach fast wheel
-    L, //use drill
-    B // extend new arm
-}
-enum Direction{
-    NORTH,
-    EAST,
-    WEST,
-    SOUTH    
-}
-public class Robot{
+
+public class Robot {
+    private enum Direction{
+        NORTH,
+        EAST,
+        WEST,
+        SOUTH    
+    }
+
     Point position;
     Direction direction;
-    List<Point> Manipulators;
+    private List<Point> manipulators;
+    private StringBuilder log = new StringBuilder();
+     
     public Robot(Point position) {
         this.position = position;
-        Manipulators = new LinkedList<>();        
-        direction = Direction.EAST;        
+        manipulators = new LinkedList<>();
         initBaseManipulators();
+        direction = Direction.EAST;  
     }
     private void initBaseManipulators(){
         extendManipulators(Point.of(position.getX()+1, position.getY()));
@@ -38,9 +30,9 @@ public class Robot{
     }
 
     public void extendManipulators(Point manipulatorExtension){
-        if(Manipulators.contains(manipulatorExtension))
+        if(manipulators.contains(manipulatorExtension))
                 throw new ExtensionException("Already extended");
-        Manipulators.add(manipulatorExtension);
+        manipulators.add(manipulatorExtension);
     }    
 
     public void move(Point newPosition){
@@ -54,8 +46,9 @@ public class Robot{
               log(Actions.S);
         position = newPosition;
     }
-    private void log(Actions action){
 
+    private void log(Actions action) {
+        log.append(action.toString());
     }
 
     public void spin(Actions action) {
@@ -76,10 +69,11 @@ public class Robot{
                 break;
         }
     }
+
     private void alignManipulators(){
         Direction manipulationWay = null;
         List<Point> tempList = new LinkedList<>();
-        for (Point point : Manipulators) {
+        for (Point point : manipulators) {
             int xDifference = point.getX() - position.getX();
             int yDifference = point.getY() - position.getY(); 
             switch(direction){
@@ -107,11 +101,19 @@ public class Robot{
         for (Point p : tempList) {
             System.out.println("new--- X:"+ p.getX() +" Y:" + p.getY());
         }
-        Manipulators = tempList;
+        manipulators = tempList;
         System.out.println("DONE: " + direction);
     }
     private void setFaceDirection(Actions action){
         
+    }
+
+    public String getActionLog() {
+        return log.toString();
+    }
+
+    public List<Point> getManipulators() {
+        return manipulators;
     }
 
     public static class ExtensionException extends RuntimeException {

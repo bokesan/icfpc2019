@@ -58,8 +58,6 @@ public class Pathfinder{
                 return new LinkedList<>();
             }
         }
-
-
         return null;
     }
 

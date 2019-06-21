@@ -13,5 +13,10 @@ Team members:
 Run `./gradlew build` in this folder to build the application.
 
 Run `./gradlew run` to execute the application.
+To pass command line arguments to the application, pass them in the `--args` argument,
+for example:
 
+    ./gradlew run --args='--file="foo.json" --solver=best --who-rules=we'
 
+To build a distribution archive, use `./gradlew distZip`. The resulting archive
+is places in `build/distributions`.

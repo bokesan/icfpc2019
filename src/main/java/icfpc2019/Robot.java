@@ -80,14 +80,8 @@ public class Robot{
         Direction manipulationWay = null;
         List<Point> tempList = new LinkedList<>();
         for (Point point : Manipulators) {
-            
-            System.out.println("old --- X:"+ point.getX() +" Y:" + point.getY());
-
             int xDifference = point.getX() - position.getX();
-            int yDifference = point.getY() - position.getY();            
-            int resX = 0;            
-            int resY = 0;   
-
+            int yDifference = point.getY() - position.getY(); 
             switch(direction){
                 case NORTH:
                     tempList.add(Point.of(position.getX() - yDifference, position.getY() - xDifference));
@@ -115,6 +109,9 @@ public class Robot{
         }
         Manipulators = tempList;
         System.out.println("DONE: " + direction);
+    }
+    private void setFaceDirection(Actions action){
+        
     }
 
     public static class ExtensionException extends RuntimeException {

@@ -26,7 +26,18 @@ dependencies {
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
+
+    implementation fileTree(dir: 'lib', include: ['*.jar'])
 }
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'icfpc2019.App'
+        )
+    }
+}
+
 
 // Define the main class for the application
 mainClassName = 'icfpc2019.App'

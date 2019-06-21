@@ -17,34 +17,34 @@ public class Pathfinder{
         width = grid.getFields().length -1;
         height = grid.getFields()[0].length -1;
         nodes = new StarNode[width+1][height+1];
-        for(int i = 0; i < grid.getFields().length; i++){
-            for(int x = 0; x < grid.getFields()[i].length ; x++){
-                StarNode temp = new StarNode(x, i);
-                temp.setIsWalkable(grid.isFree(Point.of(x, i)));
-                nodes[x][i] = temp;
+        for(int y = 0; y < grid.getFields()[0].length; y++){
+            for(int x = 0; x < grid.getFields().length; x++){
+                StarNode temp = new StarNode(x, y);
+                temp.setIsWalkable(grid.isFree(Point.of(x, y)));
+                nodes[x][y] = temp;
             }
         }
     }
     
-    public final List<StarNode> findPath(int oldX, int oldY, int newX, int newY){
-        openList = new LinkedList<StarNode>();
-        closedList = new LinkedList<StarNode>();        
-        openList.add(nodes[oldX][oldY]);
+    public final List<StarNode> findPath(Point start, Point end){
+        openList = new LinkedList<>();
+        closedList = new LinkedList<>();
+        openList.add(nodes[start.getX()][start.getY()]);
         done = false;
         StarNode current;
         while(!done){
             current = lowestFInOpen();
             closedList.add(current);
             openList.remove(current);
-            if((current.getXPosition() == newX) && (current.getYPosition()==newY)){
-                return calcPath(nodes[oldX][oldY], current);
+            if((current.getXPosition() == end.getX()) && (current.getYPosition()==end.getY())){
+                return calcPath(nodes[start.getX()][start.getY()], current);
             }            
             List<StarNode> adjacentNodes = getAdjacent(current);
             for(int i = 0; i< adjacentNodes.size(); i++){                
                 StarNode currentAdj = adjacentNodes.get(i);
                 if(!openList.contains(currentAdj)){
                     currentAdj.setPrevious(current);
-                    currentAdj.sethCosts(nodes[newX][newY]);
+                    currentAdj.sethCosts(nodes[end.getX()][end.getY()]);
                     currentAdj.setgCosts(current);
                     openList.add(currentAdj);
                 }else{
@@ -55,7 +55,7 @@ public class Pathfinder{
                 }
             }
             if(openList.isEmpty()){
-                return new LinkedList<StarNode>();
+                return new LinkedList<>();
             }
         }
 

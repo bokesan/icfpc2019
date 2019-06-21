@@ -54,23 +54,19 @@ public class Robot {
     public void spin(Actions action) {
         switch(action){
             case E:
+                turnRight();            
                 log(action);
-                alignManipulators();
                 break;
             case Q:
-                log(action); 
-                alignManipulators();
-                alignManipulators();
-                alignManipulators();
-                alignManipulators();
-                alignManipulators();
+                turnLeft();
+                log(action);                 
                 break;
             default:
                 break;
         }
     }
 
-    private void alignManipulators(){
+    private void turnLeft(){
         Direction manipulationWay = null;
         List<Point> tempList = new LinkedList<>();
         for (Point point : manipulators) {
@@ -97,15 +93,13 @@ public class Robot {
         }   
         if(manipulationWay != null){
             direction = manipulationWay;         
-        }   
-        for (Point p : tempList) {
-            System.out.println("new--- X:"+ p.getX() +" Y:" + p.getY());
         }
         manipulators = tempList;
-        System.out.println("DONE: " + direction);
     }
-    private void setFaceDirection(Actions action){
-        
+    private void turnRight(){
+        turnLeft();
+        turnLeft();
+        turnLeft();
     }
 
     public String getActionLog() {

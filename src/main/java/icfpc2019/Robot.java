@@ -15,11 +15,16 @@ public class Robot {
     Point position;
     Direction direction;
     private List<Point> manipulators;
+    private List<BoosterCode> gatheredBosters;
     private StringBuilder log = new StringBuilder();
+    private int fastWheelUnits = 0;
+    private int drillUnits = 0;
+
      
     public Robot(Point position) {
         this.position = position;
         manipulators = new LinkedList<>();
+        gatheredBosters = new LinkedList<>();
         initBaseManipulators();
         direction = Direction.EAST;  
     }
@@ -43,12 +48,22 @@ public class Robot {
         else if((newPosition.getY() > position.getY()) && position.getX() == newPosition.getX())
               log(Actions.W);
         else if((newPosition.getY() < position.getY()) && position.getX() == newPosition.getX())
-              log(Actions.S);
+              log(Actions.S);        
         position = newPosition;
+        countTimeUnit();
+    }
+    private void countTimeUnit(){
+        if(drillUnits > 0)
+            drillUnits -= 1;
+        if(fastWheelUnits > 0)
+            fastWheelUnits -= 1;
     }
 
     private void log(Actions action) {
         log.append(action.toString());
+    }
+    private void log(Actions action, Point target){
+        log.append(action.toString()+"("+target.getX()+","+target.getY()+")");
     }
 
     public void spin(Actions action) {
@@ -56,14 +71,50 @@ public class Robot {
             case E:
                 turnRight();            
                 log(action);
+                countTimeUnit();
                 break;
             case Q:
                 turnLeft();
-                log(action);                 
+                log(action); 
+                countTimeUnit();                
                 break;
             default:
                 break;
         }
+    }
+
+    public void addBooster(BoosterCode boosterCode){
+        gatheredBosters.add(boosterCode);
+    }
+    public List<BoosterCode> getGatheredBoosters(){
+        return gatheredBosters;
+    }
+    public boolean useBooster(BoosterCode boosterCode){
+        countTimeUnit();
+        if(gatheredBosters.contains(boosterCode)){            
+            return boost(boosterCode);
+        }
+        return false;
+    }
+    private boolean boost(BoosterCode boosterCode){
+        switch(boosterCode){
+            case B:
+            //TODO: implement attachment extension
+                break;
+            case F:
+                fastWheelUnits = 50;
+                break;
+            case L:
+                drillUnits = 30;
+                break;
+            case R:
+                //todo: teleport
+                break;
+            case X:
+                break;
+        }
+        
+        return true;
     }
 
     private void turnLeft(){
@@ -96,6 +147,7 @@ public class Robot {
         }
         manipulators = tempList;
     }
+
     private void turnRight(){
         turnLeft();
         turnLeft();

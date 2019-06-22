@@ -43,6 +43,7 @@ public class App {
 
 
     private static void solveProblem(String problemFile, String solutionFile) throws IOException {
+        long startTime = System.nanoTime();
         String desc = readFile(problemFile, StandardCharsets.UTF_8);
         ProblemDesc problem = ProblemDesc.of(desc);
         System.out.format("Starting solver for %s ...\n", problemFile);
@@ -71,7 +72,9 @@ public class App {
             System.out.format("Solution length: %d\n", result.length());
         } else {
             writeFile(solutionFile, result);
-            System.out.format("Solution written to %s, length: %d\n", solutionFile, result.length());
+            long elapsed = System.nanoTime() - startTime;
+            System.out.format("Solution written to %s, length: %d, elapsed: %.3fs\n",
+                    solutionFile, result.length(), elapsed / 1.0e9);
         }
     }
 

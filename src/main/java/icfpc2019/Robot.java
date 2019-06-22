@@ -106,7 +106,8 @@ public class Robot {
     }
     public boolean useBooster(BoosterCode boosterCode){
         countTimeUnit();
-        if(gatheredBosters.contains(boosterCode)){            
+        if(gatheredBosters.contains(boosterCode)){
+            gatheredBosters.remove(boosterCode);
             return boost(boosterCode);
         }
         return false;
@@ -125,7 +126,8 @@ public class Robot {
             case R:
                 //todo: teleport
                 break;
-            case X:
+            case C:
+                log(Actions.C);
                 break;
         }
         
@@ -170,6 +172,11 @@ public class Robot {
 
     public List<Point> getManipulators() {
         return manipulators;
+    }
+
+    public Robot deepClone() {
+        //TODO
+        return null;
     }
 
     public static class ExtensionException extends RuntimeException {

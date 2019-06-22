@@ -81,6 +81,23 @@ public class State {
         robot.move(point);
         removePointsToVisit(robot);
         collectBooster(robot);
+        checkSpawningOpportunity(robot);
+    }
+
+    private void checkSpawningOpportunity(Robot robot) {
+        if (robot.getGatheredBoosters().contains(BoosterCode.C)) {
+            for (BoosterLocation booster : gridBoosters) {
+                if (booster.getBoosterCode() == BoosterCode.X && booster.getPoint().equals(robot.position)) {
+                    spawnNewRobot(robot);
+                }
+            }
+        }
+    }
+
+    private void spawnNewRobot(Robot robot) {
+        Robot newBot = robot.deepClone();
+        robot.useBooster(BoosterCode.C);
+        robots.add(newBot);
     }
 
     private void collectBooster(Robot robot) {

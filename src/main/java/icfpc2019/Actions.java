@@ -9,6 +9,8 @@ public enum Actions {
     E, //turn 90° clockwise
     Q, //turn 90° anti-clockwise
     F, //attach fast wheel
-    L, //use drill
-    B // extend new arm
+    L, // use drill
+    B, // extend new arm, with coordinates
+    T, // teleport, with coordinates
+    C  // Clone Bot
 }

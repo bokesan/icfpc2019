@@ -38,11 +38,28 @@ public class State {
     public Point getNextPointToVisit(Robot robot) {
         if (toVisit.isEmpty()) return null;
         List<Point> targets = toVisit;
-        boolean complexMode = false;        
+        boolean complexMode = false;
+        if (robot.getGatheredBoosters().contains(BoosterCode.C)) {
+            //we have a clone booster and want to find a platform
+            targets = new ArrayList<>();
+            for (BoosterLocation booster : gridBoosters) {
+                if (booster.getBoosterCode() == BoosterCode.X) {
+                    if (booster.getPoint().equals(robot.position)) {
+                        robot.useBooster(C);
+                        targets.clear();
+                        complexMode = false;
+                        break;
+                    }
+                    targets.add(booster.getPoint());
+                    complexMode = true;
+                }
+            }
+            if (targets.isEmpty()) targets = toVisit;
+        }
         List<Point> teleports = new ArrayList<>();
         List<Point> boostersOfInterest = new ArrayList<>();
 
-        for (BoosterLocation booster : gridBoosters){
+        for (BoosterLocation booster : gridBoosters) {
             if (booster.getBoosterCode() == R) teleports.add(booster.getPoint());
             if (booster.getBoosterCode() == B || booster.getBoosterCode() == C) boostersOfInterest.add(booster.getPoint());
         }
@@ -59,19 +76,9 @@ public class State {
         } else if(teleports.isEmpty() &&!boostersOfInterest.isEmpty()) {
             targets = boostersOfInterest;
             complexMode = true;
-        } else if (!teleports.isEmpty() && boostersOfInterest.isEmpty()) {
-             targets = teleports;
+        } else if (!teleports.isEmpty()) {
+            targets = teleports;
             complexMode = true;
-        }else if (robot.getGatheredBoosters().contains(BoosterCode.C)) {
-            //we have a clone booster and want to find a platform
-            targets = new ArrayList<>();
-            for (BoosterLocation booster : gridBoosters) {
-                if (booster.getBoosterCode() == BoosterCode.X) {
-                    targets.add(booster.getPoint());
-                    complexMode = true;
-                }
-            }
-            if (targets.isEmpty()) targets = toVisit;
         }
         return bestPointFromTargets(targets, robot, complexMode);
     }

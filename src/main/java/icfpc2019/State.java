@@ -6,8 +6,7 @@ import java.util.List;
 import icfpc2019.pathfinder.Pathfinder;
 import icfpc2019.pathfinder.StarNode;
 
-import static icfpc2019.BoosterCode.C;
-import static icfpc2019.BoosterCode.R;
+import static icfpc2019.BoosterCode.*;
 
 public class State {
 
@@ -55,8 +54,8 @@ public class State {
         List<Point> boostersOfInterest = new ArrayList<>();
 
         for (BoosterLocation booster : gridBoosters) {
-            if (booster.getBoosterCode() == R || booster.getBoosterCode() == C) teleports.add(booster.getPoint());
-            if (booster.getBoosterCode() == BoosterCode.B) boostersOfInterest.add(booster.getPoint());
+            if (booster.getBoosterCode() == R) teleports.add(booster.getPoint());
+            if (booster.getBoosterCode() == B || booster.getBoosterCode() == C) boostersOfInterest.add(booster.getPoint());
         }
         if (!teleports.isEmpty() && !boostersOfInterest.isEmpty()){
              int bestTeleportDistance = getBestDistance(bestPointFromTargets(teleports, robot, true), robot.position, true);
@@ -64,25 +63,24 @@ public class State {
             if(bestTeleportDistance > bestBoosterDistance){
                 targets = boostersOfInterest;
                 complexMode = true;
-            }else{
+            } else {
                 targets = teleports;
                 complexMode = true;
             }            
-        }else if(teleports.isEmpty() &&!boostersOfInterest.isEmpty()){
+        } else if(teleports.isEmpty() &&!boostersOfInterest.isEmpty()) {
             targets = boostersOfInterest;
             complexMode = true;
-        }
-        else if(!teleports.isEmpty() && boostersOfInterest.isEmpty()){
+        } else if (!teleports.isEmpty()) {
             targets = teleports;
             complexMode = true;
         }
         return bestPointFromTargets(targets, robot, complexMode);
     }
+
     private Point bestPointFromTargets(List<Point> targets, Robot robot, boolean complexMode) {
         Point best = targets.get(0);
         Point current = robot.position;
         int bestDistance = getBestDistance(best, current, complexMode);
-
 
         for (Point p : targets) {
             int distance = getBestDistance(current, p, complexMode);
@@ -92,15 +90,6 @@ public class State {
             }
         }
         return best;
-    }
-
-
-    private boolean isValidBoosterPoint(Point possibleTarget){
-        BoosterLocation booster = gridBoosters.stream().filter(gb -> gb.getPoint().equals(possibleTarget)).findAny().orElse(null);
-        if(booster != null){
-            return true;
-        }else
-            return false;
     }
 
     private int getBestDistance(Point best, Point current, boolean complexMode) {

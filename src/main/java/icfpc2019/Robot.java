@@ -18,7 +18,7 @@ public class Robot {
      
     public Robot(Point position) {
         this.position = position;
-        manipulators = new LinkedList<>();
+        manipulators = new ArrayList<>();
         gatheredBosters = new LinkedList<>();
         initBaseManipulators();
         direction = Direction.EAST;  
@@ -29,44 +29,42 @@ public class Robot {
         extendManipulators(Point.of(position.getX()+1, position.getY()-1));
     }
 
-    public void extendManipulators(Point manipulatorExtension){
+    private void extendManipulators(Point manipulatorExtension){
         if(manipulators.contains(manipulatorExtension))
                 throw new ExtensionException("Already extended");
         manipulators.add(manipulatorExtension);
-    }    
-
-    public void move(Point newPosition){
-        move(newPosition, true);
     }
-    public void move(Point newPosition, boolean loggingActive){       
 
-        if(loggingActive){
-            
-            if((newPosition.getX() < position.getX()) && position.getY() == newPosition.getY()) {
-                log(Actions.A);
-                moveManipulators(-1, 0);
-            } else if((newPosition.getX() > position.getX()) && position.getY() == newPosition.getY()) {
-                log(Actions.D);
-                moveManipulators(1, 0);
-            } else if((newPosition.getY() > position.getY()) && position.getX() == newPosition.getX()) {
-                log(Actions.W);
-                moveManipulators(0, 1);
-            } else if((newPosition.getY() < position.getY()) && position.getX() == newPosition.getX()) {
-                log(Actions.S);
-                moveManipulators(0, -1);
+    public void move(Point newPosition) {
+        int dx = newPosition.getX() - position.getX();
+        int dy = newPosition.getY() - position.getY();
+        Actions action;
+        if (dy == 0) {
+            switch (dx) {
+                case -1:  action = Actions.A; break;
+                case 1:   action = Actions.D; break;
+                default: throw new InvalidMoveException(position, newPosition);
             }
-            
-            countTimeUnit();
+        } else if (dx == 0) {
+            switch (dy) {
+                case -1:  action = Actions.S; break;
+                case 1:   action = Actions.W; break;
+                default: throw new InvalidMoveException(position, newPosition);
+            }
+        } else {
+            throw new InvalidMoveException(position, newPosition);
         }
+        log(action);
+        moveManipulators(dx, dy);
+        countTimeUnit();
         position = newPosition;
     }
 
     private void moveManipulators(int x, int y) {
-        List<Point> newManipulators = new ArrayList<>();
-        for (Point p : manipulators) {
-            newManipulators.add(Point.of(p.getX() + x, p.getY() + y));
+        int n = manipulators.size();
+        for (int i = 0; i < n; i++) {
+            manipulators.set(i, manipulators.get(i).translate(x, y));
         }
-        manipulators = newManipulators;
     }
 
     private void countTimeUnit(){
@@ -84,7 +82,7 @@ public class Robot {
     }
 
     public void spin(Actions action) {
-        switch(action){
+        switch (action) {
             case E:
                 turnRight();            
                 log(action);
@@ -96,7 +94,7 @@ public class Robot {
                 countTimeUnit();                
                 break;
             default:
-                break;
+                throw new AssertionError();
         }
     }
 
@@ -178,6 +176,14 @@ public class Robot {
         public ExtensionException(String msg){
             super(msg);
         }
+    }
+
+    public static class InvalidMoveException extends RuntimeException {
+
+        public InvalidMoveException(Point position, Point newPosition) {
+            super("invalid move attempted from " + position + " to " + newPosition);
+        }
+
     }
 }
 

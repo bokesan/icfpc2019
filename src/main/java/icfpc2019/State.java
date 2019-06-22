@@ -22,6 +22,7 @@ public class State {
     private void removePointsToVisit() {
         List<Point> touched = new ArrayList<>();
         touched.add(robot.position);
+        // FIXME: check visibility
         touched.addAll(robot.getManipulators());
         for (Point p : touched) {
             toVisit.remove(p);
@@ -61,7 +62,7 @@ public class State {
         }
     }
 
-    public void move(Point point) {
+    private void move(Point point) {
         if (robot.direction == Direction.EAST || robot.direction == Direction.WEST) {
             //we are facing left or right and want to turn if we gonna move up or down
             if (point.getY() > robot.position.getY()) {

@@ -5,6 +5,7 @@ import java.util.List;
 
 public class Grid {
 
+    /** If true the coordinate is free, if false it is an obstacle or outside the map. */
     private final boolean[][] fields;
     public final Point min;
     public final Point max;
@@ -101,4 +102,5 @@ public class Grid {
         }
         return builder.toString();
     }
+
 }

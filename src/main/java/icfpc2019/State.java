@@ -102,15 +102,24 @@ public class State {
         if (complexMode) return finder.findPath(best, current, 0).size();
         return Math.abs(best.getX() - current.getX()) + Math.abs(best.getY() - current.getY());
     }
+    int moved = 0;
+    public void move(Robot robot, List<StarNode> path, int maxMoves) {
+        StarNode last = path.get(path.size() - 1);        
+        if(moved==maxMoves){
+            moved = 0;
+            return;
+        }
 
-    public void move(Robot robot, List<StarNode> path) {
-        StarNode last = path.get(path.size() - 1);
-        for (StarNode point : path) {
+        for (StarNode point : path) {   
+            if(moved==maxMoves)         
+                break;
             Point p = last.getAsPoint();
             if (!lastPointOpen(p) && !lastPointRelevant(p)) break;
             move(robot, point);
+            moved +=1;
         }
     }
+
 
     private boolean lastPointRelevant(Point lastPoint) {
         for (BoosterLocation booster : gridBoosters) {

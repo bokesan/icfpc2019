@@ -10,6 +10,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 public class App {
@@ -22,15 +23,24 @@ public class App {
 
         if (args[0].equals("--target-dir")) {
             String targetDir = args[1];
-            for (int i = 2; i < args.length; i++) {
-                solveProblem(args[i], replaceDir(args[i], targetDir));
-            }
+            Arrays.stream(args, 2, args.length)
+                    .parallel()
+                    .forEach(p -> safeSolveProblem(p, replaceDir(p, targetDir)));
         } else if (args.length > 1) {
             solveProblem(args[0], args[1]);
         } else {
             solveProblem(args[0], null);
         }
     }
+
+    private static void safeSolveProblem(String problemFile, String solutionFile) {
+        try {
+            solveProblem(problemFile, solutionFile);
+        } catch (IOException e) {
+            System.err.println("Failed to solve " + problemFile + " because of " + e);
+        }
+    }
+
 
     private static void solveProblem(String problemFile, String solutionFile) throws IOException {
         String desc = readFile(problemFile, StandardCharsets.UTF_8);

@@ -116,6 +116,9 @@ public class Grid {
         return result;
     }
 
+    /**
+     * Are the centers of the squares denoted by p1 and p2 visible from each other?
+     */
     public boolean visible(Point p1, Point p2) {
         if (!(isFree(p1) && isFree(p2))) {
             return false;
@@ -127,94 +130,44 @@ public class Grid {
         int dx = p2.getX() - p1.getX();
         int dy = p2.getY() - p1.getY();
 
-
-        if (dy == 1) {
-            if (dx == 2 && !(isFree(p1.right()) && isFree(p1.right().up())))
-                return false;
-            if (dx == -2 && !(isFree(p1.left()) && isFree(p1.left().up())))
-                return false;
-
-            if (dx == 3 && !(isFree(p1.right()) && isFree(p1.translate(2, 1))))
-                return false;
-            if (dx == -3 && !(isFree(p1.left()) && isFree(p1.translate(-2, 1))))
-                return false;
-
+        if (dy == 1 || dy == -1) {
+            int dist = Math.abs(dx);
+            int dir = sign(dx);
+            int d2 = dist >>> 1;
+            for (int i = 1; i <= d2; i++) {
+                if (!isFree(p1.translate(i * dir, 0))) {
+                    return false;
+                }
+            }
+            for (int i = d2 + (dist & 1); i < dist; i++) {
+                if (!isFree(p1.translate(i * dir, dy))) {
+                    return false;
+                }
+            }
         }
-        else if (dy == -1) {
-            if (dx == 2 && !(isFree(p1.right()) && isFree(p1.right().down())))
-                return false;
-            if (dx == -2 && !(isFree(p1.left()) && isFree(p1.left().down())))
-                return false;
-
-            if (dx == 3 && !(isFree(p1.right()) && isFree(p1.translate(2, -1))))
-                return false;
-            if (dx == -3 && !(isFree(p1.left()) && isFree(p1.translate(-2, -1))))
-                return false;
-
-        }
-        else if (dx == 1) {
-            if (dy == 2 && !(isFree(p1.up()) && isFree(p1.up().right())))
-                return false;
-            if (dy == -2 && !(isFree(p1.down()) && isFree(p1.down().right())))
-                return false;
-            if (dy == 3 && !(isFree(p1.up()) && isFree(p1.translate(1, 2))))
-                return false;
-            if (dy == -3 && !(isFree(p1.down()) && isFree(p1.translate(1, -2))))
-                return false;
-        } else if (dx == -1) {
-            if (dy == 2 && !(isFree(p1.up()) && isFree(p1.up().left())))
-                return false;
-            if (dy == -2 && !(isFree(p1.down()) && isFree(p1.down().left())))
-                return false;
-            if (dy == 3 && !(isFree(p1.up()) && isFree(p1.translate(-1, 2))))
-                return false;
-            if (dy == -3 && !(isFree(p1.down()) && isFree(p1.translate(-1, -2))))
-                return false;
+        else if (dx == 1 || dx == -1) {
+            int dist = Math.abs(dy);
+            int dir = sign(dy);
+            int d2 = dist >>> 1;
+            for (int i = 1; i <= d2; i++) {
+                if (!isFree(p1.translate(0, i * dir))) {
+                    return false;
+                }
+            }
+            for (int i = d2 + (dist & 1); i < dist; i++) {
+                if (!isFree(p1.translate(dx, i * dir))) {
+                    return false;
+                }
+            }
         } else {
             throw new RuntimeException("should not happen with the way we place manipulators: " + dx + "," + dy);
         }
         return true;
     }
 
-
-    /**
-     * Are the centers of the squares denoted by p1 and p2 visible from each other?
-     */
-    public boolean visibleX(Point p1, Point p2) {
-        if (!(isFree(p1) && isFree(p2))) {
-            return false;
-        }
-        if (p1.equals(p2)) {
-            return true;
-        }
-        int dx = p2.getX() - p1.getX();
-        int dy = p2.getY() - p1.getY();
-        int nx = Math.abs(dx);
-        int ny = Math.abs(dy);
-        if (nx > ny) {
-            // move in x dir
-            int xstep = (int) Math.signum(dx);
-            double ystep = (double) dy / nx;
-            for (int offs = 1; offs < nx; offs++) {
-                int x = p1.getX() + offs * xstep;
-                double y = p1.getY() + 0.5 + (offs - 0.5 * xstep) * ystep;
-                if (!isFree(x, (int) y)) {
-                    return false;
-                }
-            }
-        } else {
-            // move in y dir
-            int ystep = (int) Math.signum(dy);
-            double xstep = (double) dx / ny;
-            for (int offs = 1; offs < ny; offs++) {
-                int y = p1.getY() + offs * ystep;
-                double x = p1.getX() + 0.5 + (offs - 0.5 * ystep) * xstep;
-                if (!isFree((int) x, y)) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    private static int sign(int n) {
+        if (n < 0)
+            return -1;
+        return 1;
     }
-
 }

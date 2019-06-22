@@ -33,7 +33,7 @@ public class Grid {
 
             }
         }
-        return new Grid(fields, Point.of(0, 0), Point.of(xMax, yMax));
+        return new Grid(fields, Point.origin(), Point.of(xMax, yMax));
     }
 
     private static void setSquares(boolean[][] fields, List<Point> shape, List<List<Point>> shapes) {

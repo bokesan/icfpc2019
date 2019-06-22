@@ -43,19 +43,33 @@ public class App {
         State state = new State(grid, robot, problem.getBoosters());
 
         while (!state.mapFinished()) {
-            Point next = state.getNextPointToVisit();
-            List<StarNode> starPath = finder.findPath(state.getCurrentPosition(), next, 0);
-            List<Point> path = pathFromStarNodes(starPath);
-            state.move(path);
+            int numRobots = state.getNumRobots();
+            for (int i = 0; i < numRobots; i++) {
+                Robot r = state.getRobot(i);
+                Point next = state.getNextPointToVisit(r);
+                List<StarNode> starPath = finder.findPath(state.getCurrentPosition(r), next, 0);
+                List<Point> path = pathFromStarNodes(starPath);
+                state.move(r, path);
+            }
         }
 
         System.out.println("Wrapping finished!");
-        System.out.println("Solution length: " + state.getResult().length());
+        System.out.println("Solution length: " + combineResults(state).length());
 
         if (args.length > 1) {
-            writeFile(args[1], state.getResult());
+            writeFile(args[1], combineResults(state));
             System.out.println("Solution written to: " + args[1]);
         }
+    }
+
+    private static String combineResults(State state) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(state.getResult(state.getRobot(0)));
+        for (int i = 1; i < state.getNumRobots(); i++) {
+            builder.append("#");
+            builder.append(state.getResult(state.getRobot(i)));
+        }
+        return builder.toString();
     }
 
     private static void writeFile(String path, String content) throws IOException {

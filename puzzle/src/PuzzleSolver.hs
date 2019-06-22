@@ -21,12 +21,12 @@ fillTask :: Puzzle -> Grid -> (Task, Grid)
 fillTask puzzle grid = let map' = wallsToPoly grid'
                            grid' = complicate puzzle grid
                            (init:open) = allOpen grid'
-                           manip = allNth 6 open
-                           fast  = allNth 6 (drop 1 open)
-                           drill = allNth 6 (drop 2 open)
-                           tele  = allNth 6 (drop 3 open)
-                           clone = allNth 6 (drop 4 open)
-                           spawn = allNth 6 (drop 5 open)
+                           manip = take (mNum puzzle) (allNth 6 open)
+                           fast  = take (fNum puzzle) (allNth 6 (drop 1 open))
+                           drill = take (dNum puzzle) (allNth 6 (drop 2 open))
+                           tele  = take (rNum puzzle) (allNth 6 (drop 3 open))
+                           clone = take (cNum puzzle) (allNth 6 (drop 4 open))
+                           spawn = take (xNum puzzle) (allNth 6 (drop 5 open))
                        in (Task map' init [] (map (BoosterLocation B) manip ++
                                               map (BoosterLocation F) fast ++
                                               map (BoosterLocation L) drill ++

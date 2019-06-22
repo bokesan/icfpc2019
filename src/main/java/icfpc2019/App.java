@@ -49,7 +49,7 @@ public class App {
         System.out.format("Starting solver for %s ...\n", problemFile);
         Grid grid = Grid.of(problem);
         Pathfinder finder = new Pathfinder();
-        finder.initNodes(grid);
+        finder.initNodes(grid, problem.getBoosters());
         Robot initRobot = new Robot(problem.getInitialWorkerLocation());
         State state = new State(grid, initRobot, problem.getBoosters(), finder);
         while (!state.mapFinished()) {

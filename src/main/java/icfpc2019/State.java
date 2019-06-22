@@ -46,10 +46,22 @@ public class State {
 
     public Point getNextPointToVisit(Robot robot) {
         if (toVisit.isEmpty()) return null;
-        Point best = toVisit.get(0);
+        List<Point> targets = toVisit;
+        if (robot.getGatheredBoosters().contains(BoosterCode.C)) {
+            //we have a clone booster and want to find a platform
+            targets = new ArrayList<>();
+            for (BoosterLocation booster : gridBoosters) {
+                if (booster.getBoosterCode() == BoosterCode.X) {
+                    targets.add(booster.getPoint());
+                }
+            }
+            if (targets.isEmpty()) targets = toVisit;
+        }
+
+        Point best = targets.get(0);
         Point current = robot.position;
         int bestDistance = Math.abs(best.getX() - current.getX()) + Math.abs(best.getY() - current.getY());
-        for (Point p : toVisit) {
+        for (Point p : targets) {
             int distance = Math.abs(current.getX() - p.getX()) + Math.abs(current.getY() - p.getY());
             if (distance < bestDistance) {
                 bestDistance = distance;
@@ -62,9 +74,24 @@ public class State {
     public void move(Robot robot, List<StarNode> path) {
         StarNode last = path.get(path.size() - 1);
         for (StarNode point : path) {
-            if (!toVisit.contains(Point.of(last.getXPosition(), last.getYPosition()))) break;
+            if (!lastPointOpen(last) && !lastPointPlatform(last)) break;
             move(robot, point);
         }
+    }
+
+    private boolean lastPointPlatform(StarNode last) {
+        for (BoosterLocation booster : gridBoosters) {
+            if (booster.getBoosterCode() == BoosterCode.X) {
+                if (booster.getPoint().equals(Point.of(last.getXPosition(), last.getYPosition()))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean lastPointOpen(StarNode last) {
+        return toVisit.contains(Point.of(last.getXPosition(), last.getYPosition()));
     }
 
     private void move(Robot robot, StarNode node) {
@@ -100,9 +127,10 @@ public class State {
     }
 
     private void spawnNewRobot(Robot robot) {
-        Robot newBot = robot.deepClone();
+        Robot newBot = new Robot(Point.of(robot.position.getX(), robot.position.getY()));
         robot.useBooster(BoosterCode.C);
         robots.add(newBot);
+        System.out.println("-----------------------CLONING!!!!!-----------------------");
     }
 
     private void collectBooster(Robot robot) {

@@ -38,11 +38,11 @@ public class App {
         Pathfinder finder = new Pathfinder();
         finder.initNodes(grid);
 
-        Robot robot = new Robot(problem.getInitialWorkerLocation());
+        Robot initRobot = new Robot(problem.getInitialWorkerLocation());
 
-        State state = new State(grid, robot, problem.getBoosters(), finder);
+        State state = new State(grid, initRobot, problem.getBoosters(), finder);
 
-        while (!state.mapFinished()) {         
+        while (!state.mapFinished()) {
             int numRobots = state.getNumRobots();
             for (int i = 0; i < numRobots; i++) {
                 Robot r = state.getRobot(i);

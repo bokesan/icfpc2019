@@ -207,11 +207,6 @@ public class Robot {
         return manipulators;
     }
 
-    public Robot deepClone() {
-        //TODO
-        return null;
-    }
-
     public static class ExtensionException extends RuntimeException {
         public ExtensionException(String msg){
             super(msg);

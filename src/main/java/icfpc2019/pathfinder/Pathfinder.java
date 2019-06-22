@@ -91,7 +91,7 @@ public class Pathfinder{
         for (Point p : teleporters) {
             StarNode teleporterNode = nodes[p.getX()][p.getY()];
             teleporterNode.setIsTeleport(true);
-            adj.add(teleporterNode);
+            tryAddTempToAdjacent(adj, teleporterNode);
         }
 
         return adj;

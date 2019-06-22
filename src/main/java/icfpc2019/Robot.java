@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import icfpc2019.pathfinder.StarNode;
+
 
 public class Robot {
 
@@ -33,31 +35,62 @@ public class Robot {
         if(manipulators.contains(manipulatorExtension))
                 throw new ExtensionException("Already extended");
         manipulators.add(manipulatorExtension);
-    }
+    }    
 
-    public void move(Point newPosition) {
-        int dx = newPosition.getX() - position.getX();
-        int dy = newPosition.getY() - position.getY();
+    public void move(StarNode node){
+        int dx = node.getXPosition() - position.getX();
+        int dy = node.getYPosition() - position.getY();
         Actions action;
-        if (dy == 0) {
+        if (dy == 0 && !node.isTeleport()) {
             switch (dx) {
                 case -1:  action = Actions.A; break;
-                case 1:   action = Actions.D; break;
-                default: throw new InvalidMoveException(position, newPosition);
+                case 1:   action = Actions.D; break;                
+                default: throw new InvalidMoveException(position, node.getAsPoint());
             }
-        } else if (dx == 0) {
+        } else if (dx == 0 && !node.isTeleport()) {
             switch (dy) {
                 case -1:  action = Actions.S; break;
                 case 1:   action = Actions.W; break;
-                default: throw new InvalidMoveException(position, newPosition);
+                default: throw new InvalidMoveException(position, node.getAsPoint());
             }
-        } else {
-            throw new InvalidMoveException(position, newPosition);
+        } 
+        else if(node.isTeleport()){
+            action = Actions.T;
         }
-        log(action);
+        else {
+            throw new InvalidMoveException(position, node.getAsPoint());
+        }
+        if(action == Actions.T){
+            log(action, node.getAsPoint());
+        }else{
+            log(action);
+        }        
         moveManipulators(dx, dy);
         countTimeUnit();
-        position = newPosition;
+        position = node.getAsPoint();
+    }
+    public void move(StarNode node, boolean loggingActive){       
+
+        if(loggingActive){
+            
+            if((node.getXPosition() < position.getX()) && position.getY() == node.getYPosition()) {
+                log(Actions.A);
+                moveManipulators(-1, 0);
+            } else if((node.getXPosition() > position.getX()) && position.getY() ==  node.getYPosition()) {
+                log(Actions.D);
+                moveManipulators(1, 0);
+            } else if((node.getYPosition() > position.getY()) && position.getX() == node.getXPosition()) {
+                log(Actions.W);
+                moveManipulators(0, 1);
+            } else if(( node.getYPosition() < position.getY()) && position.getX() == node.getXPosition()) {
+                log(Actions.S);
+                moveManipulators(0, -1);
+            }else if(node.isTeleport()){
+                log(Actions.T, Point.of(node.getXPosition(), node.getYPosition()));                
+            }            
+            countTimeUnit();
+        }
+        position = Point.of(node.getXPosition(), node.getYPosition());
     }
 
     private void moveManipulators(int x, int y) {
@@ -106,7 +139,8 @@ public class Robot {
     }
     public boolean useBooster(BoosterCode boosterCode){
         countTimeUnit();
-        if(gatheredBosters.contains(boosterCode)){            
+        if(gatheredBosters.contains(boosterCode)){
+            gatheredBosters.remove(boosterCode);
             return boost(boosterCode);
         }
         return false;
@@ -122,10 +156,11 @@ public class Robot {
             case L:
                 drillUnits = 30;
                 break;
-            case R:
-                //todo: teleport
+            case R:                
+                log(Actions.R);
                 break;
-            case X:
+            case C:
+                log(Actions.C);
                 break;
         }
         

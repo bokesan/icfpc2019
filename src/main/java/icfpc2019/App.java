@@ -38,9 +38,9 @@ public class App {
         Pathfinder finder = new Pathfinder();
         finder.initNodes(grid);
 
-        Robot robot = new Robot(problem.getInitialWorkerLocation());
+        Robot initRobot = new Robot(problem.getInitialWorkerLocation());
 
-        State state = new State(grid, robot, problem.getBoosters());
+        State state = new State(grid, initRobot, problem.getBoosters(), finder);
 
         while (!state.mapFinished()) {
             int numRobots = state.getNumRobots();
@@ -48,8 +48,7 @@ public class App {
                 Robot r = state.getRobot(i);
                 Point next = state.getNextPointToVisit(r);
                 List<StarNode> starPath = finder.findPath(state.getCurrentPosition(r), next, 0);
-                List<Point> path = pathFromStarNodes(starPath);
-                state.move(r, path);
+                state.move(r, starPath);
             }
         }
 

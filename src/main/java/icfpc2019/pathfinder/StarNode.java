@@ -1,6 +1,6 @@
 package icfpc2019.pathfinder;
 
-import java.util.Objects;
+import icfpc2019.Point;
 
 public class StarNode {
     private int x;
@@ -21,6 +21,9 @@ public class StarNode {
     public int getYPosition(){
         return y;        
     }
+    public Point getAsPoint(){
+        return Point.of(x, y);
+    }
     public StarNode(int x, int y){
         this.x = x;
         this.y = y;
@@ -31,7 +34,7 @@ public class StarNode {
 	public void sethCosts(StarNode starNode) {
         if(this.isTeleport)
             this.hCosts = BASICMOVEMENTCOST;
-            
+
         this.hCosts = absolute(this.getXPosition() - starNode.getXPosition()
                     + absolute(this.getYPosition() - starNode.getYPosition())) * BASICMOVEMENTCOST;
     }

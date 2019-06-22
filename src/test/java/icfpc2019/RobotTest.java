@@ -2,6 +2,8 @@ package icfpc2019;
 
 import org.junit.Test;
 
+import icfpc2019.pathfinder.StarNode;
+
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
@@ -23,11 +25,12 @@ public class RobotTest {
     }
 
     @Test
-    public void testMoveRight() {
-        Point p = Point.of(10, 20);
+    public void testMoveRight() {        
+        Point p = Point.of(10, 20);        
         Point p1 = p.right();
+        StarNode node = new StarNode(p1.getX(), p1.getY());       
         Robot r = new Robot(p);
-        r.move(p1);
+        r.move(node);
         // a new robot should face east
         assertEquals(p1, r.position);
         Collection<Point> man = r.getManipulators();

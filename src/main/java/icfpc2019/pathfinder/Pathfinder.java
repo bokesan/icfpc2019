@@ -5,14 +5,14 @@ import java.util.List;
 import icfpc2019.*;
 
 public class Pathfinder{
-    LinkedList<StarNode> openList;
-    LinkedList<StarNode> closedList;
-    LinkedList<StarNode> adjacenetNodes;
-    LinkedList<Point> teleporters = new LinkedList<>();
-    StarNode[][] nodes;
-    boolean done;    
-    int width;
-    int height;
+    private LinkedList<StarNode> openList;
+    private LinkedList<StarNode> closedList;
+    private LinkedList<StarNode> adjacenetNodes;
+    private LinkedList<Point> teleporters = new LinkedList<>();
+    private StarNode[][] nodes;
+    private boolean done;    
+    private int width;
+    private int height;
 
     public void initNodes(Grid grid){
         width = grid.getFields().length -1;
@@ -45,7 +45,7 @@ public class Pathfinder{
                 if(!openList.contains(currentAdj)){
                     currentAdj.setPrevious(current);
                     currentAdj.sethCosts(nodes[end.getX()][end.getY()]);
-                    if(isDirectionChange(current, currentAdj)){
+                    if(isDirectionChange(current, currentAdj) && !currentAdj.isTeleport()){
                         currentAdj.setMovementPanelty(penalty);
                     }
                     currentAdj.setgCosts(current);

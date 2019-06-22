@@ -13,7 +13,6 @@ public class StarNode {
     private boolean isTeleport;
 
     protected static final int BASICMOVEMENTCOST = 10;
-    protected static final int DIAGONALMOVEMENTCOST = 14;
 
     public int getXPosition(){
         return x;
@@ -32,14 +31,12 @@ public class StarNode {
         this.previous = node;
     }
 	public void sethCosts(StarNode starNode) {
-        if(this.isTeleport)
-            this.hCosts = BASICMOVEMENTCOST;
-
-        this.hCosts = absolute(this.getXPosition() - starNode.getXPosition()
-                    + absolute(this.getYPosition() - starNode.getYPosition())) * BASICMOVEMENTCOST;
+        int dx = absolute(this.getXPosition() - starNode.getXPosition());
+        int dy = absolute(this.getYPosition() - starNode.getYPosition());
+        this.hCosts = (int) (BASICMOVEMENTCOST * Math.sqrt(dx * dx + dy * dy));
     }
-    private void setgCosts(int gCosts) {
-        this.gCosts = gCosts + movementPenalty;        
+    private void setgCosts(int gCosts) {               
+        this.gCosts = gCosts + movementPenalty;                
     }
     public void setgCosts(StarNode previousNode, int basicCost) {
         setgCosts(previousNode.getgCosts() + basicCost);
@@ -68,6 +65,8 @@ public class StarNode {
 		return previous;
 	}
 	public int getfCosts() {
+        if(this.isTeleport)
+           return BASICMOVEMENTCOST;
 		return gCosts + hCosts;
 	}
 	public boolean isWalkable() {

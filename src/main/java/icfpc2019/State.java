@@ -64,7 +64,7 @@ public class State {
         StarNode last = path.get(path.size() - 1);
         for (StarNode point : path) {
             if (!lastPointOpen(last) && !lastPointRelevant(last)) break;
-            move(robot, point);
+            move(robot, point, false);
         }
     }
 
@@ -86,36 +86,58 @@ public class State {
         return toVisit.contains(Point.of(last.getXPosition(), last.getYPosition()));
     }
 
-    private void move(Robot robot, StarNode node) {
+    public void move(Robot robot, StarNode node, boolean singleMoveMode) {
+        if (checkSpawningOpportunity(robot) && singleMoveMode) return;
+        if (checkUseBooster(robot) && singleMoveMode) return;
         if (robot.direction == Direction.EAST || robot.direction == Direction.WEST) {
             //we are facing left or right and want to turn if we gonna move up or down
             if (node.getYPosition() > robot.position.getY()) {
                 turn(robot,robot.direction == Direction.EAST);
+                if (singleMoveMode) return;
             } else if (node.getYPosition() < robot.position.getY()) {
                 turn(robot,robot.direction == Direction.WEST);
+                if (singleMoveMode) return;
             }
         } else {
             //we are facing up or down and want to turn if we gonna move left or right
             if (node.getXPosition() > robot.position.getX()) {
                 turn(robot,robot.direction == Direction.SOUTH);
+                if (singleMoveMode) return;
             } else if (node.getXPosition() < robot.position.getX()) {
                 turn(robot,robot.direction == Direction.NORTH);
+                if (singleMoveMode) return;
             }
         }
         robot.move(node);
         removePointsToVisit(robot);
-        collectBooster(robot);
+        collectBooster(robot, singleMoveMode);
+        if (singleMoveMode) return;
         checkSpawningOpportunity(robot);
     }
 
-    private void checkSpawningOpportunity(Robot robot) {
+    private boolean checkUseBooster(Robot robot) {
+        if (robot.getGatheredBoosters().contains(BoosterCode.R)) {
+            robot.useBooster(BoosterCode.R);
+            finder.addTeleport(robot.position);
+            return true;
+        }
+        if (robot.getGatheredBoosters().contains(BoosterCode.B)) {
+            robot.useBooster(BoosterCode.B);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean checkSpawningOpportunity(Robot robot) {
         if (robot.getGatheredBoosters().contains(BoosterCode.C)) {
             for (BoosterLocation booster : gridBoosters) {
                 if (booster.getBoosterCode() == BoosterCode.X && booster.getPoint().equals(robot.position)) {
                     spawnNewRobot(robot);
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     private void spawnNewRobot(Robot robot) {
@@ -124,11 +146,12 @@ public class State {
         robots.add(newBot);
     }
 
-    private void collectBooster(Robot robot) {
+    private void collectBooster(Robot robot, boolean singleStepMode) {
         for (BoosterLocation booster : gridBoosters) {
             if (booster.getBoosterCode() != BoosterCode.X && booster.getPoint().equals(robot.position)) {
                 robot.addBooster(booster.getBoosterCode());
                 gridBoosters.remove(booster);
+                if (singleStepMode) return;
                 switch (booster.getBoosterCode()) {
                     case R:
                         robot.useBooster(booster.getBoosterCode());

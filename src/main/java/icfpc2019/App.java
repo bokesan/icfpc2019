@@ -48,7 +48,12 @@ public class App {
                 Point next = state.getNextPointToVisit(r);
                 if (next == null) continue;
                 List<StarNode> starPath = finder.findPath(state.getCurrentPosition(r), next, 10);
-                state.move(r, starPath);
+                if (numRobots > 1) {
+                    //only one field at a time when there are multiple robots, to keep them in sync
+                    state.move(r, starPath.get(0), true);
+                } else {
+                    state.move(r, starPath);
+                }
             }
         }
         System.out.println("Solution length: " + combineResults(state).length());

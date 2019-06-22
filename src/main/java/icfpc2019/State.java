@@ -130,11 +130,17 @@ public class State {
             if (booster.getBoosterCode() != BoosterCode.X && booster.getPoint().equals(robot.position)) {
                 robot.addBooster(booster.getBoosterCode());
                 gridBoosters.remove(booster);
-                if(booster.getBoosterCode() == BoosterCode.R){                    
-                    robot.useBooster(booster.getBoosterCode());
-                    finder.addTeleport(robot.position);
+                switch (booster.getBoosterCode()) {
+                    case R:
+                        robot.useBooster(booster.getBoosterCode());
+                        finder.addTeleport(robot.position);
+                        break;
+                    case B:
+                        robot.useBooster(BoosterCode.B);
+                        break;
+                    default:
+                        break;
                 }
-                    
                 break;
             }
         }

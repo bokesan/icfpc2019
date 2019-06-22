@@ -69,29 +69,6 @@ public class Robot {
         countTimeUnit();
         position = node.getAsPoint();
     }
-    public void move(StarNode node, boolean loggingActive){       
-
-        if(loggingActive){
-            
-            if((node.getXPosition() < position.getX()) && position.getY() == node.getYPosition()) {
-                log(Actions.A);
-                moveManipulators(-1, 0);
-            } else if((node.getXPosition() > position.getX()) && position.getY() ==  node.getYPosition()) {
-                log(Actions.D);
-                moveManipulators(1, 0);
-            } else if((node.getYPosition() > position.getY()) && position.getX() == node.getXPosition()) {
-                log(Actions.W);
-                moveManipulators(0, 1);
-            } else if(( node.getYPosition() < position.getY()) && position.getX() == node.getXPosition()) {
-                log(Actions.S);
-                moveManipulators(0, -1);
-            }else if(node.isTeleport()){
-                log(Actions.T, Point.of(node.getXPosition(), node.getYPosition()));                
-            }            
-            countTimeUnit();
-        }
-        position = Point.of(node.getXPosition(), node.getYPosition());
-    }
 
     private void moveManipulators(int x, int y) {
         int n = manipulators.size();
@@ -134,9 +111,11 @@ public class Robot {
     public void addBooster(BoosterCode boosterCode){
         gatheredBosters.add(boosterCode);
     }
+
     public List<BoosterCode> getGatheredBoosters(){
         return gatheredBosters;
     }
+
     public boolean useBooster(BoosterCode boosterCode){
         countTimeUnit();
         if(gatheredBosters.contains(boosterCode)){
@@ -145,10 +124,26 @@ public class Robot {
         }
         return false;
     }
-    private boolean boost(BoosterCode boosterCode){
+
+    private boolean boost(BoosterCode boosterCode) {
         switch(boosterCode){
             case B:
-            //TODO: implement attachment extension
+                // attach to side of existing manipulators
+                Direction origDir = direction;
+                while (direction != Direction.EAST)
+                    turnLeft();
+                Point p;
+                for (int offs = 2; ; offs++) {
+                    p = position.translate(1, offs);
+                    if (!manipulators.contains(p))
+                        break;
+                    p = position.translate(1, -offs);
+                    if (!manipulators.contains(p))
+                        break;
+                }
+                manipulators.add(p);
+                while (direction != origDir)
+                    turnLeft();
                 break;
             case F:
                 fastWheelUnits = 50;

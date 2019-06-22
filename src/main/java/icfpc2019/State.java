@@ -122,7 +122,6 @@ public class State {
         Robot newBot = new Robot(Point.of(robot.position.getX(), robot.position.getY()));
         robot.useBooster(BoosterCode.C);
         robots.add(newBot);
-        System.out.println("-----------------------CLONING!!!!!-----------------------");
     }
 
     private void collectBooster(Robot robot) {

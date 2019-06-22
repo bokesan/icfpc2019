@@ -3,9 +3,7 @@ package icfpc2019;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
 import icfpc2019.pathfinder.StarNode;
-
 
 public class Robot {
 
@@ -17,7 +15,6 @@ public class Robot {
     private int fastWheelUnits = 0;
     private int drillUnits = 0;
 
-     
     public Robot(Point position) {
         this.position = position;
         manipulators = new ArrayList<>();
@@ -25,6 +22,7 @@ public class Robot {
         initBaseManipulators();
         direction = Direction.EAST;  
     }
+
     private void initBaseManipulators(){
         extendManipulators(Point.of(position.getX()+1, position.getY()));
         extendManipulators(Point.of(position.getX()+1, position.getY()+1));
@@ -32,8 +30,9 @@ public class Robot {
     }
 
     private void extendManipulators(Point manipulatorExtension){
-        if(manipulators.contains(manipulatorExtension))
-                throw new ExtensionException("Already extended");
+        if(manipulators.contains(manipulatorExtension)) {
+            throw new ExtensionException("Already extended");
+        }
         manipulators.add(manipulatorExtension);
     }    
 
@@ -53,16 +52,14 @@ public class Robot {
                 case 1:   action = Actions.W; break;
                 default: throw new InvalidMoveException(position, node.getAsPoint());
             }
-        } 
-        else if(node.isTeleport()){
+        } else if(node.isTeleport()) {
             action = Actions.T;
-        }
-        else {
+        } else {
             throw new InvalidMoveException(position, node.getAsPoint());
         }
-        if(action == Actions.T){
+        if(action == Actions.T) {
             log(action, node.getAsPoint());
-        }else{
+        } else {
             log(action);
         }        
         moveManipulators(dx, dy);
@@ -87,6 +84,7 @@ public class Robot {
     private void log(Actions action) {
         log.append(action.toString());
     }
+
     private void log(Actions action, Point target){
         log.append(action.toString()).append("(").append(target.getX()).append(",").append(target.getY()).append(")");
     }
@@ -158,7 +156,6 @@ public class Robot {
                 log(Actions.C);
                 break;
         }
-        
         return true;
     }
 
@@ -209,11 +206,9 @@ public class Robot {
     }
 
     public static class InvalidMoveException extends RuntimeException {
-
         public InvalidMoveException(Point position, Point newPosition) {
             super("invalid move attempted from " + position + " to " + newPosition);
         }
-
     }
 }
 

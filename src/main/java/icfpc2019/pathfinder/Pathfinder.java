@@ -13,14 +13,14 @@ public class Pathfinder{
     private int width;
     private int height;
 
-    public void initNodes(Grid grid){
+    public void initNodes(Grid grid, List<BoosterLocation> boosters){
         width = grid.getFields().length -1;
         height = grid.getFields()[0].length -1;
         nodes = new StarNode[width+1][height+1];
 
         for(int y = 0; y < grid.getFields()[0].length; y++){
             for(int x = 0; x < grid.getFields().length; x++){
-                StarNode temp = new StarNode(x, y);
+                StarNode temp = new StarNode(x, y);                
                 temp.setIsWalkable(grid.isFree(Point.of(x, y)));
                 nodes[x][y] = temp;
             }

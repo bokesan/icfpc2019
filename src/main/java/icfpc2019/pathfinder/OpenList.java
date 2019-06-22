@@ -9,11 +9,11 @@ public class OpenList {
 
         @Override
         public int compare(StarNode a, StarNode b) {
-            int r = Integer.compare(a.getfCosts(), b.getfCosts());
+            int r = Double.compare(a.getfCosts(), b.getfCosts());
             if (r != 0) return r;
-            r = Integer.compare(a.getXPosition(), b.getXPosition());
+            r = Double.compare(a.getXPosition(), b.getXPosition());
             if (r != 0) return r;
-            return Integer.compare(a.getYPosition(), b.getYPosition());
+            return Double.compare(a.getYPosition(), b.getYPosition());
         }
     }
 

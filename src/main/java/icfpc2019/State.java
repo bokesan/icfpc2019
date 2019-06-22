@@ -12,7 +12,7 @@ public class State {
 
     private List<BoosterLocation> gridBoosters;
     private Grid grid;
-    private List<Point> toVisit;
+    private List<Point> toVisit; // FIXME: Performance: can we use a faster data structure for this?
     private List<Robot> robots = new ArrayList<>();
     private Pathfinder finder;
 

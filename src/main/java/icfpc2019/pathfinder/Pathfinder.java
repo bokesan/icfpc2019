@@ -1,17 +1,15 @@
 package icfpc2019.pathfinder;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+
 import icfpc2019.*;
 
 public class Pathfinder{
-    private LinkedList<StarNode> openList;
+
+    private final OpenList openList = new OpenList();
     private HashSet<StarNode> closedList;
     private LinkedList<Point> teleporters = new LinkedList<>();
     private StarNode[][] nodes;
-    private boolean done;    
     private int width;
     private int height;
 
@@ -28,42 +26,38 @@ public class Pathfinder{
             }
         }
     }
-    public final List<StarNode> findPath(Point start, Point end, int penalty){
-        openList = new LinkedList<>();
+
+    public final List<StarNode> findPath(Point start, Point end, int penalty) {
+        openList.clear();
         closedList = new HashSet<>();
         openList.add(nodes[start.getX()][start.getY()]);
-        done = false;
-        StarNode current = null;
-        while(!done){
-            current = lowestFInOpen();            
+        for (;;) {
+            StarNode current = openList.poll();
+            if (current == null) {
+                return Collections.emptyList();
+            }
             closedList.add(current);
-            openList.remove(current);
-            if((current.getXPosition() == end.getX()) && (current.getYPosition()==end.getY())){
+            if ((current.getXPosition() == end.getX()) && (current.getYPosition() == end.getY())) {
                 return calcPath(nodes[start.getX()][start.getY()], current);
-            }            
+            }
             List<StarNode> adjacentNodes = getAdjacent(current);
-            for(int i = 0; i< adjacentNodes.size(); i++){                
-                StarNode currentAdj = adjacentNodes.get(i);
-                if(!openList.contains(currentAdj)){
+            for (StarNode currentAdj : adjacentNodes) {
+                if (!openList.contains(currentAdj)) {
                     currentAdj.setPrevious(current);
                     currentAdj.sethCosts(nodes[start.getX()][start.getY()], nodes[end.getX()][end.getY()]);
-                    if(isDirectionChange(current, currentAdj) && !currentAdj.isTeleport()){
+                    if (isDirectionChange(current, currentAdj) && !currentAdj.isTeleport()) {
                         currentAdj.setMovementPanelty(penalty);
                     }
                     currentAdj.setgCosts(current);
                     openList.add(currentAdj);
-                }else{
-                    if(currentAdj.getgCosts() > currentAdj.calculategCosts(current)){
+                } else {
+                    if (currentAdj.getgCosts() > currentAdj.calculategCosts(current)) {
                         currentAdj.setPrevious(current);
                         currentAdj.setgCosts(current);
                     }
                 }
             }
-            if(openList.isEmpty()){
-                return new LinkedList<>();
-            }
         }
-        return null;
     }
 
     private ArrayList<StarNode> getAdjacent(StarNode current) {
@@ -104,35 +98,25 @@ public class Pathfinder{
             adj.add(temp);
         }
     }
-    public boolean isDirectionChange(StarNode current, StarNode next){
-        if(current.getPrevious() == null)
+
+    private boolean isDirectionChange(StarNode current, StarNode next){
+        if (current.getPrevious() == null)
             return false;
-        boolean res = current.getXPosition() == current.getPrevious().getXPosition() && current.getPrevious().getXPosition() == next.getXPosition() || current.getYPosition() == current.getPrevious().getYPosition() && current.getPrevious().getYPosition() == next.getYPosition();
-        return res;
+        return current.getXPosition() == current.getPrevious().getXPosition() && current.getPrevious().getXPosition() == next.getXPosition() || current.getYPosition() == current.getPrevious().getYPosition() && current.getPrevious().getYPosition() == next.getYPosition();
     }
 
     private List<StarNode> calcPath(StarNode start, StarNode goal) {
-        LinkedList<StarNode> path = new LinkedList<StarNode>();
+        LinkedList<StarNode> path = new LinkedList<>();
         StarNode curr = goal;
         boolean done = false;
         while (!done) {
             path.addFirst(curr);
-            curr = (StarNode) curr.getPrevious();
-
+            curr = curr.getPrevious();
             if (curr.equals(start)) {
                 done = true;
             }
         }
         return path;
-    }
-    private StarNode lowestFInOpen() {
-        StarNode cheapest = openList.get(0);
-        for (int i = 0; i < openList.size(); i++) {            
-            if (openList.get(i).getfCosts() < cheapest.getfCosts()) {
-                cheapest = openList.get(i);                
-            }
-        }
-        return cheapest;
     }
 
     public void addTeleport(Point teleport){

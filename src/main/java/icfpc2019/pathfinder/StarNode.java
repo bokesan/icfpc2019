@@ -30,6 +30,8 @@ public class StarNode {
     public void setPrevious(StarNode node){
         this.previous = node;
     }
+
+    //uses euclidean distance
 	public void sethCosts(StarNode starNode) {
         int dx = absolute(this.getXPosition() - starNode.getXPosition());
         int dy = absolute(this.getYPosition() - starNode.getYPosition());

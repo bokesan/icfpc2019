@@ -10,8 +10,10 @@ public class StarNode {
     private int hCosts;
     private int movementPenalty = 0;
     private boolean isWalkable;
+    private boolean isTeleport;
 
     protected static final int BASICMOVEMENTCOST = 10;
+    protected static final int DIAGONALMOVEMENTCOST = 14;
 
     public int getXPosition(){
         return x;
@@ -27,6 +29,9 @@ public class StarNode {
         this.previous = node;
     }
 	public void sethCosts(StarNode starNode) {
+        if(this.isTeleport)
+            this.hCosts = BASICMOVEMENTCOST;
+            
         this.hCosts = absolute(this.getXPosition() - starNode.getXPosition()
                     + absolute(this.getYPosition() - starNode.getYPosition())) * BASICMOVEMENTCOST;
     }
@@ -36,7 +41,7 @@ public class StarNode {
     public void setgCosts(StarNode previousNode, int basicCost) {
         setgCosts(previousNode.getgCosts() + basicCost);
     }
-	public void setgCosts(StarNode previousNode) {        
+	public void setgCosts(StarNode previousNode) { 
         setgCosts(previousNode, BASICMOVEMENTCOST);
     }
     public void setMovementPanelty(int movementPanelty) {
@@ -64,7 +69,10 @@ public class StarNode {
 	}
 	public boolean isWalkable() {
 		return isWalkable;
-	}
+    }
+    public boolean isTeleport(){
+        return isTeleport;
+    }
 	public void setIsDiagonaly(boolean b) {
     }
     
@@ -75,4 +83,7 @@ public class StarNode {
     public String toString() {
         return "(" + x + "," + y + ")";
     }
+	public void setIsTeleport(boolean isTeleport) {
+        this.isTeleport = isTeleport;
+	}
 }

@@ -8,6 +8,7 @@ public class Pathfinder{
     LinkedList<StarNode> openList;
     LinkedList<StarNode> closedList;
     LinkedList<StarNode> adjacenetNodes;
+    LinkedList<Point> teleporters = new LinkedList<>();
     StarNode[][] nodes;
     boolean done;    
     int width;
@@ -25,7 +26,6 @@ public class Pathfinder{
             }
         }
     }
-    StarNode lastNode = null;
     public final List<StarNode> findPath(Point start, Point end){
         openList = new LinkedList<>();
         closedList = new LinkedList<>();
@@ -33,10 +33,7 @@ public class Pathfinder{
         done = false;
         StarNode current = null;
         while(!done){
-            if(current != null)
-                 lastNode = current;
-            current = lowestFInOpen();
-            
+            current = lowestFInOpen();            
             closedList.add(current);
             openList.remove(current);
             if((current.getXPosition() == end.getX()) && (current.getYPosition()==end.getY())){
@@ -48,11 +45,10 @@ public class Pathfinder{
                 if(!openList.contains(currentAdj)){
                     currentAdj.setPrevious(current);
                     currentAdj.sethCosts(nodes[end.getX()][end.getY()]);
-                    if(lastNode != null && isDirectionChange(current, currentAdj)){
-                        currentAdj.setMovementPanelty(10);
+                    if(isDirectionChange(current, currentAdj)){
+                        currentAdj.setMovementPanelty(17);
                     }
                     currentAdj.setgCosts(current);
-                    
                     openList.add(currentAdj);
                 }else{
                     if(currentAdj.getgCosts() > currentAdj.calculategCosts(current)){
@@ -75,26 +71,32 @@ public class Pathfinder{
         StarNode temp;
         if (x > 0) {
             temp = nodes[x-1][y];
-            tryAddTempToAdjacent(adj, temp, current);
+            tryAddTempToAdjacent(adj, temp);
         }
 
         if (x < width) {
             temp = nodes[x+1][y];
-            tryAddTempToAdjacent(adj, temp, current);
+            tryAddTempToAdjacent(adj, temp);
         }
 
         if (y > 0) {
             temp = nodes[x][y-1];
-            tryAddTempToAdjacent(adj, temp, current);
+            tryAddTempToAdjacent(adj, temp);
         }
 
         if (y < height) {
             temp = nodes[x][y+1];
-            tryAddTempToAdjacent(adj, temp, current);
+            tryAddTempToAdjacent(adj, temp);
         }
+        for (Point p : teleporters) {
+            StarNode teleporterNode = nodes[p.getX()][p.getY()];
+            teleporterNode.setIsTeleport(true);
+            adj.add(teleporterNode);
+        }
+
         return adj;
     }
-    private void tryAddTempToAdjacent(List<StarNode> adj, StarNode temp, StarNode current){
+    private void tryAddTempToAdjacent(List<StarNode> adj, StarNode temp){
         if (temp.isWalkable() && !closedList.contains(temp)) {
             temp.setIsDiagonaly(false);
             adj.add(temp);
@@ -107,19 +109,8 @@ public class Pathfinder{
         return res;
     }
 
-    // public boolean isStraightLine(StarNode current, StarNode next){
-
-    //     if(lastNode != null)
-    //         return  
-    //             lastNode.getXPosition() == current.getXPosition() && current.getXPosition() == next.getXPosition() ||
-    //             lastNode.getYPosition() == current.getYPosition() && current.getYPosition() == next.getYPosition();
-    //     else
-    //         return false;
-    // }
-
     private List<StarNode> calcPath(StarNode start, StarNode goal) {
         LinkedList<StarNode> path = new LinkedList<StarNode>();
-
         StarNode curr = goal;
         boolean done = false;
         while (!done) {
@@ -141,5 +132,9 @@ public class Pathfinder{
             }
         }
         return cheapest;
+    }
+
+    public void addTeleport(Point teleport){
+        teleporters.add(teleport);
     }
 }

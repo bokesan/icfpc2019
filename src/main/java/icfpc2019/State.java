@@ -92,8 +92,8 @@ public class State {
             int distance = getBestDistance(current, p, complexMode);
             if (distance < bestDistance) {
                 bestDistance = distance;
-                best = p;
-            }
+                best = p;                
+            }        
         }
         return best;
     }

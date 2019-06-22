@@ -40,13 +40,13 @@ public class App {
 
         Robot robot = new Robot(problem.getInitialWorkerLocation());
 
-        State state = new State(grid, robot, problem.getBoosters());
+        State state = new State(grid, robot, problem.getBoosters(), finder);
 
         while (!state.mapFinished()) {
             Point next = state.getNextPointToVisit();
-            List<StarNode> starPath = finder.findPath(state.getCurrentPosition(), next, 0);
+            List<StarNode> starPath = finder.findPath(state.getCurrentPosition(), next, 0);            
             List<Point> path = pathFromStarNodes(starPath);
-            state.move(path);
+            state.move(starPath);
         }
 
         System.out.println("Wrapping finished!");

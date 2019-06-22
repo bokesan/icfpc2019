@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import icfpc2019.pathfinder.StarNode;
+
 
 public class Robot {
 
@@ -35,30 +37,31 @@ public class Robot {
         manipulators.add(manipulatorExtension);
     }    
 
-    public void move(Point newPosition){
-        move(newPosition, true);
+    public void move(StarNode node){
+        move(node, true);
     }
-    public void move(Point newPosition, boolean loggingActive){       
+    public void move(StarNode node, boolean loggingActive){       
 
         if(loggingActive){
             
-            if((newPosition.getX() < position.getX()) && position.getY() == newPosition.getY()) {
+            if((node.getXPosition() < position.getX()) && position.getY() == node.getYPosition()) {
                 log(Actions.A);
                 moveManipulators(-1, 0);
-            } else if((newPosition.getX() > position.getX()) && position.getY() == newPosition.getY()) {
+            } else if((node.getXPosition() > position.getX()) && position.getY() ==  node.getYPosition()) {
                 log(Actions.D);
                 moveManipulators(1, 0);
-            } else if((newPosition.getY() > position.getY()) && position.getX() == newPosition.getX()) {
+            } else if((node.getYPosition() > position.getY()) && position.getX() == node.getXPosition()) {
                 log(Actions.W);
                 moveManipulators(0, 1);
-            } else if((newPosition.getY() < position.getY()) && position.getX() == newPosition.getX()) {
+            } else if(( node.getYPosition() < position.getY()) && position.getX() == node.getXPosition()) {
                 log(Actions.S);
                 moveManipulators(0, -1);
-            }
-            
+            }else if(node.isTeleport()){
+                log(Actions.T, Point.of(node.getXPosition(), node.getYPosition()));                
+            }            
             countTimeUnit();
         }
-        position = newPosition;
+        position = Point.of(node.getXPosition(), node.getYPosition());
     }
 
     private void moveManipulators(int x, int y) {
@@ -124,8 +127,8 @@ public class Robot {
             case L:
                 drillUnits = 30;
                 break;
-            case R:
-                //todo: teleport
+            case R:                
+                log(Actions.R);
                 break;
             case X:
                 break;

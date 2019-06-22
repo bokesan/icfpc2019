@@ -3,18 +3,23 @@ package icfpc2019;
 import java.util.ArrayList;
 import java.util.List;
 
+import icfpc2019.pathfinder.Pathfinder;
+import icfpc2019.pathfinder.StarNode;
+
 public class State {
 
     private List<BoosterLocation> gridBoosters;
     private Grid grid;
     private List<Point> toVisit;
     private Robot robot;
+    private Pathfinder finder;
 
-    public State(Grid grid, Robot robot, List<BoosterLocation> boosters) {
+    public State(Grid grid, Robot robot, List<BoosterLocation> boosters, Pathfinder finder) {
         this.grid = grid;
         this.robot = robot;
         this.gridBoosters = boosters;
         this.toVisit = new ArrayList<>();
+        this.finder = finder;
         addPointsToVisit();
         removePointsToVisit();
     }
@@ -53,31 +58,31 @@ public class State {
         return best;
     }
 
-    public void move(List<Point> path) {
-        Point last = path.get(path.size() - 1);
-        for (Point point : path) {
-            if (!toVisit.contains(last)) break;
-            move(point);
+    public void move(List<StarNode> path) {
+        StarNode last = path.get(path.size() - 1);
+        for (StarNode node : path) {
+            if (!toVisit.contains(Point.of(last.getXPosition(), last.getYPosition()))) break;
+            move(node);
         }
     }
 
-    public void move(Point point) {
+    public void move(StarNode node) {
         if (robot.direction == Direction.EAST || robot.direction == Direction.WEST) {
             //we are facing left or right and want to turn if we gonna move up or down
-            if (point.getY() > robot.position.getY()) {
+            if (node.getYPosition() > robot.position.getY()) {
                 turn(robot.direction == Direction.EAST);
-            } else if (point.getY() < robot.position.getY()) {
+            } else if (node.getYPosition() < robot.position.getY()) {
                 turn(robot.direction == Direction.WEST);
             }
         } else {
             //we are facing up or down and want to turn if we gonna move left or right
-            if (point.getX() > robot.position.getX()) {
+            if (node.getXPosition() > robot.position.getX()) {
                 turn(robot.direction == Direction.SOUTH);
-            } else if (point.getX() < robot.position.getX()) {
+            } else if (node.getXPosition() < robot.position.getX()) {
                 turn(robot.direction == Direction.NORTH);
             }
         }
-        robot.move(point);
+        robot.move(node);
         removePointsToVisit();
         collectBooster();
     }
@@ -87,6 +92,11 @@ public class State {
             if (booster.getPoint().equals(robot.position)) {
                 robot.addBooster(booster.getBoosterCode());
                 gridBoosters.remove(booster);
+                if(booster.getBoosterCode() == BoosterCode.R){                    
+                    robot.useBooster(booster.getBoosterCode());
+                    finder.addTeleport(robot.position);
+                }
+                    
                 break;
             }
         }

@@ -10,5 +10,7 @@ public enum Actions {
     Q, //turn 90° anti-clockwise
     F, //attach fast wheel
     L, //use drill
-    B // extend new arm
+    B, // extend new arm
+    T, //use teleport
+    R, //install beacon
 }

@@ -6,6 +6,8 @@ import java.util.List;
 import icfpc2019.pathfinder.Pathfinder;
 import icfpc2019.pathfinder.StarNode;
 
+import static icfpc2019.BoosterCode.R;
+
 public class State {
 
     private List<BoosterLocation> gridBoosters;
@@ -36,22 +38,32 @@ public class State {
     public Point getNextPointToVisit(Robot robot) {
         if (toVisit.isEmpty()) return null;
         List<Point> targets = toVisit;
+        boolean complexMode = false;
         if (robot.getGatheredBoosters().contains(BoosterCode.C)) {
             //we have a clone booster and want to find a platform
             targets = new ArrayList<>();
             for (BoosterLocation booster : gridBoosters) {
                 if (booster.getBoosterCode() == BoosterCode.X) {
                     targets.add(booster.getPoint());
+                    complexMode = true;
                 }
             }
             if (targets.isEmpty()) targets = toVisit;
         }
+        List<Point> teleports = new ArrayList<>();
+        for (BoosterLocation booster : gridBoosters) {
+            if (booster.getBoosterCode() == R) teleports.add(booster.getPoint());
+        }
+        if (!teleports.isEmpty()) {
+            targets = teleports;
+            complexMode = true;
+        }
 
         Point best = targets.get(0);
         Point current = robot.position;
-        int bestDistance = Math.abs(best.getX() - current.getX()) + Math.abs(best.getY() - current.getY());
+        int bestDistance = getBestDistance(best, current, complexMode);
         for (Point p : targets) {
-            int distance = Math.abs(current.getX() - p.getX()) + Math.abs(current.getY() - p.getY());
+            int distance = getBestDistance(current, p, complexMode);
             if (distance < bestDistance) {
                 bestDistance = distance;
                 best = p;
@@ -60,18 +72,23 @@ public class State {
         return best;
     }
 
+    private int getBestDistance(Point best, Point current, boolean complexMode) {
+        if (complexMode) return finder.findPath(best, current, 0).size();
+        return Math.abs(best.getX() - current.getX()) + Math.abs(best.getY() - current.getY());
+    }
+
     public void move(Robot robot, List<StarNode> path) {
         StarNode last = path.get(path.size() - 1);
         for (StarNode point : path) {
             if (!lastPointOpen(last) && !lastPointRelevant(last)) break;
-            move(robot, point, false);
+            move(robot, point);
         }
     }
 
     private boolean lastPointRelevant(StarNode last) {
         for (BoosterLocation booster : gridBoosters) {
             if (booster.getBoosterCode() == BoosterCode.X ||
-                booster.getBoosterCode() == BoosterCode.R ||
+                booster.getBoosterCode() == R ||
                 booster.getBoosterCode() == BoosterCode.C ||
                 booster.getBoosterCode() == BoosterCode.B) {
                 if (booster.getPoint().equals(Point.of(last.getXPosition(), last.getYPosition()))) {
@@ -86,58 +103,36 @@ public class State {
         return toVisit.contains(Point.of(last.getXPosition(), last.getYPosition()));
     }
 
-    public void move(Robot robot, StarNode node, boolean singleMoveMode) {
-        if (checkSpawningOpportunity(robot) && singleMoveMode) return;
-        if (checkUseBooster(robot) && singleMoveMode) return;
+    public void move(Robot robot, StarNode node) {
         if (robot.direction == Direction.EAST || robot.direction == Direction.WEST) {
             //we are facing left or right and want to turn if we gonna move up or down
             if (node.getYPosition() > robot.position.getY()) {
                 turn(robot,robot.direction == Direction.EAST);
-                if (singleMoveMode) return;
             } else if (node.getYPosition() < robot.position.getY()) {
                 turn(robot,robot.direction == Direction.WEST);
-                if (singleMoveMode) return;
             }
         } else {
             //we are facing up or down and want to turn if we gonna move left or right
             if (node.getXPosition() > robot.position.getX()) {
                 turn(robot,robot.direction == Direction.SOUTH);
-                if (singleMoveMode) return;
             } else if (node.getXPosition() < robot.position.getX()) {
                 turn(robot,robot.direction == Direction.NORTH);
-                if (singleMoveMode) return;
             }
         }
         robot.move(node);
         removePointsToVisit(robot);
-        collectBooster(robot, singleMoveMode);
-        if (singleMoveMode) return;
+        collectBooster(robot);
         checkSpawningOpportunity(robot);
     }
 
-    private boolean checkUseBooster(Robot robot) {
-        if (robot.getGatheredBoosters().contains(BoosterCode.R)) {
-            robot.useBooster(BoosterCode.R);
-            finder.addTeleport(robot.position);
-            return true;
-        }
-        if (robot.getGatheredBoosters().contains(BoosterCode.B)) {
-            robot.useBooster(BoosterCode.B);
-            return true;
-        }
-        return false;
-    }
-
-    private boolean checkSpawningOpportunity(Robot robot) {
+    private void checkSpawningOpportunity(Robot robot) {
         if (robot.getGatheredBoosters().contains(BoosterCode.C)) {
             for (BoosterLocation booster : gridBoosters) {
                 if (booster.getBoosterCode() == BoosterCode.X && booster.getPoint().equals(robot.position)) {
                     spawnNewRobot(robot);
-                    return true;
                 }
             }
         }
-        return false;
     }
 
     private void spawnNewRobot(Robot robot) {
@@ -146,12 +141,11 @@ public class State {
         robots.add(newBot);
     }
 
-    private void collectBooster(Robot robot, boolean singleStepMode) {
+    private void collectBooster(Robot robot) {
         for (BoosterLocation booster : gridBoosters) {
             if (booster.getBoosterCode() != BoosterCode.X && booster.getPoint().equals(robot.position)) {
                 robot.addBooster(booster.getBoosterCode());
                 gridBoosters.remove(booster);
-                if (singleStepMode) return;
                 switch (booster.getBoosterCode()) {
                     case R:
                         robot.useBooster(booster.getBoosterCode());

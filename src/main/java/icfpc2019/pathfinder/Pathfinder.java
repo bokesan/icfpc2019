@@ -1,13 +1,14 @@
 package icfpc2019.pathfinder;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import icfpc2019.*;
 
 public class Pathfinder{
     private LinkedList<StarNode> openList;
-    private LinkedList<StarNode> closedList;
-    private LinkedList<StarNode> adjacenetNodes;
+    private HashSet<StarNode> closedList;
     private LinkedList<Point> teleporters = new LinkedList<>();
     private StarNode[][] nodes;
     private boolean done;    
@@ -18,6 +19,7 @@ public class Pathfinder{
         width = grid.getFields().length -1;
         height = grid.getFields()[0].length -1;
         nodes = new StarNode[width+1][height+1];
+
         for(int y = 0; y < grid.getFields()[0].length; y++){
             for(int x = 0; x < grid.getFields().length; x++){
                 StarNode temp = new StarNode(x, y);
@@ -25,10 +27,32 @@ public class Pathfinder{
                 nodes[x][y] = temp;
             }
         }
+        for(int y = 0; y < grid.getFields()[0].length; y++){
+            for(int x = 0; x < grid.getFields().length; x++){
+                StarNode temp = nodes[x][y];
+                for (int n = 0; n <= 0; n++) {
+                    for (int m = 0; m <= 0; m++) {
+                        // Discard the cell     
+                        if (n == 0 && m == 0) {
+                            continue; 
+                        }
+                        int ii = x - n;
+                        int jj = y - m;
+                        // Check if the neighbor coordinates are 
+                        // inside of the array bounds 
+                        if (ii >= 0 && ii < grid.getFields()[0].length && jj >= 0 && jj < grid.getFields().length) {
+                            temp.AddNeighbours(nodes[ii][jj]);
+                        }
+                    }
+                }
+                System.out.println(temp.getNeighourSize());
+            }
+        }
     }
     public final List<StarNode> findPath(Point start, Point end, int penalty){
         openList = new LinkedList<>();
-        closedList = new LinkedList<>();
+        closedList = new HashSet<>();
+        StarNode t = nodes[end.getX()][end.getY()];
         openList.add(nodes[start.getX()][start.getY()]);
         done = false;
         StarNode current = null;
@@ -64,10 +88,10 @@ public class Pathfinder{
         return null;
     }
 
-    private List<StarNode> getAdjacent(StarNode current) {
+    private ArrayList<StarNode> getAdjacent(StarNode current) {
         int x = current.getXPosition();
         int y = current.getYPosition();
-        List<StarNode> adj = new LinkedList<StarNode>();
+        ArrayList<StarNode> adj = new ArrayList<StarNode>();
         StarNode temp;
         if (x > 0) {
             temp = nodes[x-1][y];
@@ -96,7 +120,7 @@ public class Pathfinder{
 
         return adj;
     }
-    private void tryAddTempToAdjacent(List<StarNode> adj, StarNode temp){
+    private void tryAddTempToAdjacent(ArrayList<StarNode> adj, StarNode temp){
         if (temp.isWalkable() && !closedList.contains(temp)) {
             temp.setIsDiagonaly(false);
             adj.add(temp);

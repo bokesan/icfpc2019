@@ -1,5 +1,8 @@
 package icfpc2019.pathfinder;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import icfpc2019.Point;
 
 public class StarNode {
@@ -29,6 +32,13 @@ public class StarNode {
     }
     public void setPrevious(StarNode node){
         this.previous = node;
+    }
+    private List<StarNode> neighbours = new LinkedList<>();
+    public void AddNeighbours(StarNode neighbour){
+        neighbours.add(neighbour);
+    }
+    public int getNeighourSize(){
+        return neighbours.size();
     }
 
     //uses euclidean distance

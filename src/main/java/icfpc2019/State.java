@@ -6,6 +6,8 @@ import java.util.List;
 import icfpc2019.pathfinder.Pathfinder;
 import icfpc2019.pathfinder.StarNode;
 
+import static icfpc2019.BoosterCode.R;
+
 public class State {
 
     private List<BoosterLocation> gridBoosters;
@@ -36,28 +38,43 @@ public class State {
     public Point getNextPointToVisit(Robot robot) {
         if (toVisit.isEmpty()) return null;
         List<Point> targets = toVisit;
+        boolean complexMode = false;
         if (robot.getGatheredBoosters().contains(BoosterCode.C)) {
             //we have a clone booster and want to find a platform
             targets = new ArrayList<>();
             for (BoosterLocation booster : gridBoosters) {
                 if (booster.getBoosterCode() == BoosterCode.X) {
                     targets.add(booster.getPoint());
+                    complexMode = true;
                 }
             }
             if (targets.isEmpty()) targets = toVisit;
         }
+        List<Point> teleports = new ArrayList<>();
+        for (BoosterLocation booster : gridBoosters) {
+            if (booster.getBoosterCode() == R) teleports.add(booster.getPoint());
+        }
+        if (!teleports.isEmpty()) {
+            targets = teleports;
+            complexMode = true;
+        }
 
         Point best = targets.get(0);
         Point current = robot.position;
-        int bestDistance = Math.abs(best.getX() - current.getX()) + Math.abs(best.getY() - current.getY());
+        int bestDistance = getBestDistance(best, current, complexMode);
         for (Point p : targets) {
-            int distance = Math.abs(current.getX() - p.getX()) + Math.abs(current.getY() - p.getY());
+            int distance = getBestDistance(current, p, complexMode);
             if (distance < bestDistance) {
                 bestDistance = distance;
                 best = p;
             }
         }
         return best;
+    }
+
+    private int getBestDistance(Point best, Point current, boolean complexMode) {
+        if (complexMode) return finder.findPath(best, current, 0).size();
+        return Math.abs(best.getX() - current.getX()) + Math.abs(best.getY() - current.getY());
     }
 
     public void move(Robot robot, List<StarNode> path) {
@@ -71,7 +88,7 @@ public class State {
     private boolean lastPointRelevant(StarNode last) {
         for (BoosterLocation booster : gridBoosters) {
             if (booster.getBoosterCode() == BoosterCode.X ||
-                booster.getBoosterCode() == BoosterCode.R ||
+                booster.getBoosterCode() == R ||
                 booster.getBoosterCode() == BoosterCode.C ||
                 booster.getBoosterCode() == BoosterCode.B) {
                 if (booster.getPoint().equals(Point.of(last.getXPosition(), last.getYPosition()))) {

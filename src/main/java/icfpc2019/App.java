@@ -47,6 +47,7 @@ public class App {
             for (int i = 0; i < numRobots; i++) {
                 Robot r = state.getRobot(i);
                 Point next = state.getNextPointToVisit(r);
+                if (next == null) continue;
                 List<StarNode> starPath = finder.findPath(state.getCurrentPosition(r), next, 0);
                 state.move(r, starPath);
             }

@@ -45,29 +45,29 @@ public class Robot {
             switch (dx) {
                 case -1:  action = Actions.A; break;
                 case 1:   action = Actions.D; break;                
-                default: throw new InvalidMoveException(position, Point.of(node.getXPosition(), node.getYPosition()));
+                default: throw new InvalidMoveException(position, node.getAsPoint());
             }
         } else if (dx == 0 && !node.isTeleport()) {
             switch (dy) {
                 case -1:  action = Actions.S; break;
                 case 1:   action = Actions.W; break;
-                default: throw new InvalidMoveException(position, Point.of(node.getXPosition(), node.getYPosition()));
+                default: throw new InvalidMoveException(position, node.getAsPoint());
             }
         } 
         else if(node.isTeleport()){
             action = Actions.T;
         }
         else {
-            throw new InvalidMoveException(position, Point.of(node.getXPosition(), node.getYPosition()));
+            throw new InvalidMoveException(position, node.getAsPoint());
         }
         if(action == Actions.T){
-            log(action, Point.of(node.getXPosition(), node.getYPosition()));
+            log(action, node.getAsPoint());
         }else{
             log(action);
         }        
         moveManipulators(dx, dy);
         countTimeUnit();
-        position = Point.of(node.getXPosition(), node.getYPosition());
+        position = node.getAsPoint();
     }
     public void move(StarNode node, boolean loggingActive){       
 
@@ -92,32 +92,6 @@ public class Robot {
         }
         position = Point.of(node.getXPosition(), node.getYPosition());
     }
-
-    // public void move(Point newPosition) {
-    //     int dx = newPosition.getX() - position.getX();
-    //     int dy = newPosition.getY() - position.getY();
-    //     Actions action;
-    //     if (dy == 0) {
-    //         switch (dx) {
-    //             case -1:  action = Actions.A; break;
-    //             case 1:   action = Actions.D; break;
-    //             default: throw new InvalidMoveException(position, newPosition);
-    //         }
-    //     } else if (dx == 0) {
-    //         switch (dy) {
-    //             case -1:  action = Actions.S; break;
-    //             case 1:   action = Actions.W; break;
-    //             default: throw new InvalidMoveException(position, newPosition);
-    //         }
-    //     } else {
-    //         throw new InvalidMoveException(position, newPosition);
-    //     }
-    //         log(action);    //     
-        
-    //     moveManipulators(dx, dy);
-    //     countTimeUnit();
-    //     position = newPosition;
-    // }
 
     private void moveManipulators(int x, int y) {
         int n = manipulators.size();

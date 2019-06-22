@@ -142,6 +142,7 @@ public class Robot {
                 manipulators.add(p);
                 while (direction != origDir)
                     turnLeft();
+                log(Actions.B, Point.of(p.getX() - position.getX(), p.getY() - position.getY()));
                 break;
             case F:
                 fastWheelUnits = 50;

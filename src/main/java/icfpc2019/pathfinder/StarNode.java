@@ -24,10 +24,10 @@ public class StarNode {
         this.y = y;
     }
     public void setPrevious(StarNode node){
-        previous = node;
+        this.previous = node;
     }
 	public void sethCosts(StarNode starNode) {
-        hCosts = absolute(this.getXPosition() - starNode.getXPosition()
+        this.hCosts = absolute(this.getXPosition() - starNode.getXPosition()
                     + absolute(this.getYPosition() - starNode.getYPosition())) * BASICMOVEMENTCOST;
     }
     private void setgCosts(int gCosts) {
@@ -51,6 +51,7 @@ public class StarNode {
     public int gethCosts(){
         return hCosts;
     }
+   
 
 	public int calculategCosts(StarNode current) {
 		return current.getgCosts() + BASICMOVEMENTCOST + movementPenalty;

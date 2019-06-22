@@ -33,14 +33,6 @@ public class StarNode {
     public void setPrevious(StarNode node){
         this.previous = node;
     }
-    private List<StarNode> neighbours = new LinkedList<>();
-    public void AddNeighbours(StarNode neighbour){
-        neighbours.add(neighbour);
-    }
-    public int getNeighourSize(){
-        return neighbours.size();
-    }
-
     //uses euclidean distance
 	public void sethCosts(StarNode starNode) {
         int dx = absolute(this.getXPosition() - starNode.getXPosition());

@@ -27,33 +27,10 @@ public class Pathfinder{
                 nodes[x][y] = temp;
             }
         }
-        
-        for(int y = 0; y < grid.getFields()[0].length; y++){
-            for(int x = 0; x < grid.getFields().length; x++){
-                StarNode temp = nodes[x][y];
-                for (int n = -1; n <= 1; n++) {
-                    for (int m = -1; m <= 1; m++) {
-                        // Discard the cell     
-                        if (n == 0 && m == 0) {
-                            continue; 
-                        }
-                        int ii = x - n;
-                        int jj = y - m;
-                        // Check if the neighbor coordinates are 
-                        // inside of the array bounds 
-                        if (ii >= 0 && ii < grid.getFields()[0].length && jj >= 0 && jj < grid.getFields().length) {
-                            temp.AddNeighbours(nodes[ii][jj]);
-                        }
-                    }
-                }
-                System.out.println(temp.getNeighourSize());
-            }
-        }
     }
     public final List<StarNode> findPath(Point start, Point end, int penalty){
         openList = new LinkedList<>();
         closedList = new HashSet<>();
-        StarNode temp = nodes[end.getX()][end.getY()];
         openList.add(nodes[start.getX()][start.getY()]);
         done = false;
         StarNode current = null;

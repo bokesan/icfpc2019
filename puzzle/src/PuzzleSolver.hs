@@ -20,19 +20,22 @@ solvePuzzle puzzle = fmap (fillTask puzzle) $ go start (oSqs puzzle)
 fillTask :: Puzzle -> Grid -> (Task, Grid)
 fillTask puzzle grid = let map' = wallsToPoly grid'
                            grid' = complicate puzzle grid
-                           (init:open) = allOpen grid'
-                           manip = take (mNum puzzle) (allNth 6 open)
-                           fast  = take (fNum puzzle) (allNth 6 (drop 1 open))
-                           drill = take (dNum puzzle) (allNth 6 (drop 2 open))
-                           tele  = take (rNum puzzle) (allNth 6 (drop 3 open))
-                           clone = take (cNum puzzle) (allNth 6 (drop 4 open))
-                           spawn = take (xNum puzzle) (allNth 6 (drop 5 open))
-                       in (Task map' init [] (map (BoosterLocation B) manip ++
-                                              map (BoosterLocation F) fast ++
-                                              map (BoosterLocation L) drill ++
-                                              map (BoosterLocation X) spawn ++
-                                              map (BoosterLocation C) clone ++
-                                              map (BoosterLocation R) tele),
+                           (start:open) = allOpen grid'
+                           !maxBoosters = maximum [mNum puzzle, fNum puzzle, dNum puzzle,
+                                                  rNum puzzle, cNum puzzle, xNum puzzle]
+                           !step = (length open - 50) `quot` maxBoosters
+                           manip = take (mNum puzzle) (allNth step (drop 40 open))
+                           fast  = take (fNum puzzle) (allNth step (drop 41 open))
+                           drill = take (dNum puzzle) (allNth step (drop 42 open))
+                           tele  = take (rNum puzzle) (allNth step (drop 43 open))
+                           clone = take (cNum puzzle) (allNth step (drop 44 open))
+                           spawn = take (xNum puzzle) (allNth step (drop 45 open))
+                       in (Task map' start [] (map (BoosterLocation B) manip ++
+                                               map (BoosterLocation F) fast ++
+                                               map (BoosterLocation L) drill ++
+                                               map (BoosterLocation X) spawn ++
+                                               map (BoosterLocation C) clone ++
+                                               map (BoosterLocation R) tele),
                             grid')
 
 allNth :: Int -> [a] -> [a]

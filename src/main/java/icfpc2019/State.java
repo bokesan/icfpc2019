@@ -6,6 +6,7 @@ import java.util.List;
 import icfpc2019.pathfinder.Pathfinder;
 import icfpc2019.pathfinder.StarNode;
 
+import static icfpc2019.BoosterCode.C;
 import static icfpc2019.BoosterCode.R;
 
 public class State {
@@ -52,7 +53,7 @@ public class State {
         }
         List<Point> teleports = new ArrayList<>();
         for (BoosterLocation booster : gridBoosters) {
-            if (booster.getBoosterCode() == R) teleports.add(booster.getPoint());
+            if (booster.getBoosterCode() == R || booster.getBoosterCode() == C) teleports.add(booster.getPoint());
         }
         if (!teleports.isEmpty()) {
             targets = teleports;

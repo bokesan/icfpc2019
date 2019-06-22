@@ -84,7 +84,7 @@ public class State {
 
     private void collectBooster() {
         for (BoosterLocation booster : gridBoosters) {
-            if (booster.getPoint().equals(robot.position)) {
+            if (booster.getBoosterCode() != BoosterCode.X && booster.getPoint().equals(robot.position)) {
                 robot.addBooster(booster.getBoosterCode());
                 gridBoosters.remove(booster);
                 break;

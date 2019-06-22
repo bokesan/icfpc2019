@@ -63,14 +63,17 @@ public class State {
     public void move(Robot robot, List<StarNode> path) {
         StarNode last = path.get(path.size() - 1);
         for (StarNode point : path) {
-            if (!lastPointOpen(last) && !lastPointPlatform(last)) break;
+            if (!lastPointOpen(last) && !lastPointRelevant(last)) break;
             move(robot, point);
         }
     }
 
-    private boolean lastPointPlatform(StarNode last) {
+    private boolean lastPointRelevant(StarNode last) {
         for (BoosterLocation booster : gridBoosters) {
-            if (booster.getBoosterCode() == BoosterCode.X) {
+            if (booster.getBoosterCode() == BoosterCode.X ||
+                booster.getBoosterCode() == BoosterCode.R ||
+                booster.getBoosterCode() == BoosterCode.C ||
+                booster.getBoosterCode() == BoosterCode.B) {
                 if (booster.getPoint().equals(Point.of(last.getXPosition(), last.getYPosition()))) {
                     return true;
                 }

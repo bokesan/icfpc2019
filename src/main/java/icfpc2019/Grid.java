@@ -74,7 +74,7 @@ public class Grid {
     }
 
     public boolean isFree(int x, int y) {
-        if (x > max.getX() || x < min.getX() || y > max.getY() || y < min.getY()) {
+        if (x >= max.getX() || x < min.getX() || y >= max.getY() || y < min.getY()) {
             return false;
         } else {
             return fields[x][y];

@@ -104,6 +104,19 @@ public class Grid {
         return builder.toString();
     }
 
+    public List<Point> getFreeSquares() {
+        List<Point> result = new ArrayList<>((max.getX() - min.getX()) * (max.getY() - min.getY()) / 2);
+        for (int x = min.getX(); x < max.getX(); x++) {
+            for (int y = min.getY(); y < max.getY(); y++) {
+                if (fields[x][y]) {
+                    result.add(Point.of(x, y));
+                }
+            }
+        }
+        return result;
+    }
+
+
     /**
      * Are the centers of the squares denoted by p1 and p2 visible from each other?
      */

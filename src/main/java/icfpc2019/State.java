@@ -20,26 +20,15 @@ public class State {
         this.gridBoosters = boosters;
         this.toVisit = new ArrayList<>();
         this.finder = finder;
-        addPointsToVisit();
+        this.toVisit = grid.getFreeSquares();
         removePointsToVisit(robot);
     }
 
     private void removePointsToVisit(Robot robot) {
-        List<Point> touched = new ArrayList<>();
-        touched.add(robot.position);
-        // FIXME: check visibility
-        touched.addAll(robot.getManipulators());
-        for (Point p : touched) {
-            toVisit.remove(p);
-        }
-    }
-
-    private void addPointsToVisit() {
-        for (int x = 0; x < grid.max.getX(); x++) {
-            for (int y = 0; y < grid.max.getY(); y++) {
-                if (grid.isFree(x, y)) {
-                    toVisit.add(Point.of(x, y));
-                }
+        toVisit.remove(robot.position);
+        for (Point p : robot.getManipulators()) {
+            if (grid.visible(robot.position, p)) {
+                toVisit.remove(p);
             }
         }
     }

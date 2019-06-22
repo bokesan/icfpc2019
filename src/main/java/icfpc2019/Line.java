@@ -2,6 +2,9 @@ package icfpc2019;
 
 import java.util.Objects;
 
+/**
+ * A horizontal or vertical line. The start point is always the one closer to the origin.
+ */
 public class Line {
 
     private final Point p1;
@@ -54,7 +57,8 @@ public class Line {
         return p1.getY() == p2.getY();
     }
 
+    @Override
     public String toString() {
-        return "(" + p1.getX() + "," + p1.getY() + ") - (" + p2.getX() + "," + p2.getY() + ")";
+        return p1 + " - " + p2;
     }
 }

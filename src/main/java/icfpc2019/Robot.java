@@ -20,7 +20,7 @@ public class Robot {
      
     public Robot(Point position) {
         this.position = position;
-        manipulators = new LinkedList<>();
+        manipulators = new ArrayList<>();
         gatheredBosters = new LinkedList<>();
         initBaseManipulators();
         direction = Direction.EAST;  
@@ -31,14 +31,43 @@ public class Robot {
         extendManipulators(Point.of(position.getX()+1, position.getY()-1));
     }
 
-    public void extendManipulators(Point manipulatorExtension){
+    private void extendManipulators(Point manipulatorExtension){
         if(manipulators.contains(manipulatorExtension))
                 throw new ExtensionException("Already extended");
         manipulators.add(manipulatorExtension);
     }    
 
     public void move(StarNode node){
-        move(node, true);
+        int dx = node.getXPosition() - position.getX();
+        int dy = node.getYPosition() - position.getY();
+        Actions action;
+        if (dy == 0 && !node.isTeleport()) {
+            switch (dx) {
+                case -1:  action = Actions.A; break;
+                case 1:   action = Actions.D; break;                
+                default: throw new InvalidMoveException(position, Point.of(node.getXPosition(), node.getYPosition()));
+            }
+        } else if (dx == 0 && !node.isTeleport()) {
+            switch (dy) {
+                case -1:  action = Actions.S; break;
+                case 1:   action = Actions.W; break;
+                default: throw new InvalidMoveException(position, Point.of(node.getXPosition(), node.getYPosition()));
+            }
+        } 
+        else if(node.isTeleport()){
+            action = Actions.T;
+        }
+        else {
+            throw new InvalidMoveException(position, Point.of(node.getXPosition(), node.getYPosition()));
+        }
+        if(action == Actions.T){
+            log(action, Point.of(node.getXPosition(), node.getYPosition()));
+        }else{
+            log(action);
+        }        
+        moveManipulators(dx, dy);
+        countTimeUnit();
+        position = Point.of(node.getXPosition(), node.getYPosition());
     }
     public void move(StarNode node, boolean loggingActive){       
 
@@ -64,12 +93,37 @@ public class Robot {
         position = Point.of(node.getXPosition(), node.getYPosition());
     }
 
+    // public void move(Point newPosition) {
+    //     int dx = newPosition.getX() - position.getX();
+    //     int dy = newPosition.getY() - position.getY();
+    //     Actions action;
+    //     if (dy == 0) {
+    //         switch (dx) {
+    //             case -1:  action = Actions.A; break;
+    //             case 1:   action = Actions.D; break;
+    //             default: throw new InvalidMoveException(position, newPosition);
+    //         }
+    //     } else if (dx == 0) {
+    //         switch (dy) {
+    //             case -1:  action = Actions.S; break;
+    //             case 1:   action = Actions.W; break;
+    //             default: throw new InvalidMoveException(position, newPosition);
+    //         }
+    //     } else {
+    //         throw new InvalidMoveException(position, newPosition);
+    //     }
+    //         log(action);    //     
+        
+    //     moveManipulators(dx, dy);
+    //     countTimeUnit();
+    //     position = newPosition;
+    // }
+
     private void moveManipulators(int x, int y) {
-        List<Point> newManipulators = new ArrayList<>();
-        for (Point p : manipulators) {
-            newManipulators.add(Point.of(p.getX() + x, p.getY() + y));
+        int n = manipulators.size();
+        for (int i = 0; i < n; i++) {
+            manipulators.set(i, manipulators.get(i).translate(x, y));
         }
-        manipulators = newManipulators;
     }
 
     private void countTimeUnit(){
@@ -87,7 +141,7 @@ public class Robot {
     }
 
     public void spin(Actions action) {
-        switch(action){
+        switch (action) {
             case E:
                 turnRight();            
                 log(action);
@@ -99,7 +153,7 @@ public class Robot {
                 countTimeUnit();                
                 break;
             default:
-                break;
+                throw new AssertionError();
         }
     }
 
@@ -111,7 +165,8 @@ public class Robot {
     }
     public boolean useBooster(BoosterCode boosterCode){
         countTimeUnit();
-        if(gatheredBosters.contains(boosterCode)){            
+        if(gatheredBosters.contains(boosterCode)){
+            gatheredBosters.remove(boosterCode);
             return boost(boosterCode);
         }
         return false;
@@ -130,7 +185,8 @@ public class Robot {
             case R:                
                 log(Actions.R);
                 break;
-            case X:
+            case C:
+                log(Actions.C);
                 break;
         }
         
@@ -177,10 +233,23 @@ public class Robot {
         return manipulators;
     }
 
+    public Robot deepClone() {
+        //TODO
+        return null;
+    }
+
     public static class ExtensionException extends RuntimeException {
         public ExtensionException(String msg){
             super(msg);
         }
+    }
+
+    public static class InvalidMoveException extends RuntimeException {
+
+        public InvalidMoveException(Point position, Point newPosition) {
+            super("invalid move attempted from " + position + " to " + newPosition);
+        }
+
     }
 }
 

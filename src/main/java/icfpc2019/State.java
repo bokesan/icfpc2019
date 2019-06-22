@@ -11,22 +11,23 @@ public class State {
     private List<BoosterLocation> gridBoosters;
     private Grid grid;
     private List<Point> toVisit;
-    private Robot robot;
+    private List<Robot> robots = new ArrayList<>();
     private Pathfinder finder;
 
     public State(Grid grid, Robot robot, List<BoosterLocation> boosters, Pathfinder finder) {
         this.grid = grid;
-        this.robot = robot;
+        this.robots.add(robot);
         this.gridBoosters = boosters;
         this.toVisit = new ArrayList<>();
         this.finder = finder;
         addPointsToVisit();
-        removePointsToVisit();
+        removePointsToVisit(robot);
     }
 
-    private void removePointsToVisit() {
+    private void removePointsToVisit(Robot robot) {
         List<Point> touched = new ArrayList<>();
         touched.add(robot.position);
+        // FIXME: check visibility
         touched.addAll(robot.getManipulators());
         for (Point p : touched) {
             toVisit.remove(p);
@@ -43,7 +44,7 @@ public class State {
         }
     }
 
-    public Point getNextPointToVisit() {
+    public Point getNextPointToVisit(Robot robot) {
         if (toVisit.isEmpty()) return null;
         Point best = toVisit.get(0);
         Point current = robot.position;
@@ -58,38 +59,55 @@ public class State {
         return best;
     }
 
-    public void move(List<StarNode> path) {
+    public void move(Robot robot, List<StarNode> path) {
         StarNode last = path.get(path.size() - 1);
-        for (StarNode node : path) {
+        for (StarNode point : path) {
             if (!toVisit.contains(Point.of(last.getXPosition(), last.getYPosition()))) break;
-            move(node);
+            move(robot, point);
         }
     }
 
-    public void move(StarNode node) {
+    private void move(Robot robot, StarNode node) {
         if (robot.direction == Direction.EAST || robot.direction == Direction.WEST) {
             //we are facing left or right and want to turn if we gonna move up or down
             if (node.getYPosition() > robot.position.getY()) {
-                turn(robot.direction == Direction.EAST);
+                turn(robot,robot.direction == Direction.EAST);
             } else if (node.getYPosition() < robot.position.getY()) {
-                turn(robot.direction == Direction.WEST);
+                turn(robot,robot.direction == Direction.WEST);
             }
         } else {
             //we are facing up or down and want to turn if we gonna move left or right
             if (node.getXPosition() > robot.position.getX()) {
-                turn(robot.direction == Direction.SOUTH);
+                turn(robot,robot.direction == Direction.SOUTH);
             } else if (node.getXPosition() < robot.position.getX()) {
-                turn(robot.direction == Direction.NORTH);
+                turn(robot,robot.direction == Direction.NORTH);
             }
         }
         robot.move(node);
-        removePointsToVisit();
-        collectBooster();
+        removePointsToVisit(robot);
+        collectBooster(robot);
+        checkSpawningOpportunity(robot);
     }
 
-    private void collectBooster() {
+    private void checkSpawningOpportunity(Robot robot) {
+        if (robot.getGatheredBoosters().contains(BoosterCode.C)) {
+            for (BoosterLocation booster : gridBoosters) {
+                if (booster.getBoosterCode() == BoosterCode.X && booster.getPoint().equals(robot.position)) {
+                    spawnNewRobot(robot);
+                }
+            }
+        }
+    }
+
+    private void spawnNewRobot(Robot robot) {
+        Robot newBot = robot.deepClone();
+        robot.useBooster(BoosterCode.C);
+        robots.add(newBot);
+    }
+
+    private void collectBooster(Robot robot) {
         for (BoosterLocation booster : gridBoosters) {
-            if (booster.getPoint().equals(robot.position)) {
+            if (booster.getBoosterCode() != BoosterCode.X && booster.getPoint().equals(robot.position)) {
                 robot.addBooster(booster.getBoosterCode());
                 gridBoosters.remove(booster);
                 if(booster.getBoosterCode() == BoosterCode.R){                    
@@ -106,20 +124,28 @@ public class State {
         return toVisit.isEmpty();
     }
 
-    public String getResult() {
+    public String getResult(Robot robot) {
         return robot.getActionLog();
     }
 
-    public Point getCurrentPosition() {
+    public Point getCurrentPosition(Robot robot) {
         return robot.position;
     }
 
-    public void turn(boolean left) {
+    public void turn(Robot robot, boolean left) {
         if (left) {
             robot.spin(Actions.Q);
         } else {
             robot.spin(Actions.E);
         }
-        removePointsToVisit();
+        removePointsToVisit(robot);
+    }
+
+    public int getNumRobots() {
+        return robots.size();
+    }
+
+    public Robot getRobot(int index) {
+        return robots.get(index);
     }
 }

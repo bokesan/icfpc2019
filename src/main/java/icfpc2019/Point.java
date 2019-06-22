@@ -4,6 +4,8 @@ import java.util.Objects;
 
 public class Point {
 
+    private static final Point ORIGIN = new Point(0,0);
+
     private final int x;
     private final int y;
 
@@ -12,11 +14,11 @@ public class Point {
         this.y = y;
     }
 
+    public static Point origin() {
+        return ORIGIN;
+    }
+
     public static Point of(int x, int y) {
-        if (x < 0 || y < 0) {
-            //We need to track manipulators "outside" the grid, so negative coordinates can happen
-            //throw new IllegalArgumentException("invalid point: " + x + "," + y);
-        }
         return new Point(x, y);
     }
 
@@ -26,6 +28,30 @@ public class Point {
 
     public int getY() {
         return y;
+    }
+
+    public Point left() {
+        return of(x - 1, y);
+    }
+
+    public Point right() {
+        return of(x + 1, y);
+    }
+
+    public Point up() {
+        return of(x, y + 1);
+    }
+
+    public Point down() {
+        return of(x, y - 1);
+    }
+
+    public Point translate(int dx, int dy) {
+        return of(x + dx, y + dy);
+    }
+
+    public Point translate(Point offset) {
+        return of(x + offset.x, y + offset.y);
     }
 
     @Override
@@ -40,5 +66,10 @@ public class Point {
     @Override
     public int hashCode() {
         return Objects.hash(x, y);
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + "," + y + ")";
     }
 }

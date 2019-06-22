@@ -106,18 +106,19 @@ public class State {
     public void move(Robot robot, List<StarNode> path) {
         StarNode last = path.get(path.size() - 1);
         for (StarNode point : path) {
-            if (!lastPointOpen(last) && !lastPointRelevant(last)) break;
+            Point p = last.getAsPoint();
+            if (!lastPointOpen(p) && !lastPointRelevant(p)) break;
             move(robot, point);
         }
     }
 
-    private boolean lastPointRelevant(StarNode last) {
+    private boolean lastPointRelevant(Point lastPoint) {
         for (BoosterLocation booster : gridBoosters) {
             if (booster.getBoosterCode() == BoosterCode.X ||
                 booster.getBoosterCode() == R ||
                 booster.getBoosterCode() == BoosterCode.C ||
                 booster.getBoosterCode() == BoosterCode.B) {
-                if (booster.getPoint().equals(Point.of(last.getXPosition(), last.getYPosition()))) {
+                if (booster.getPoint().equals(lastPoint)) {
                     return true;
                 }
             }
@@ -125,11 +126,11 @@ public class State {
         return false;
     }
 
-    private boolean lastPointOpen(StarNode last) {
-        return toVisit.contains(Point.of(last.getXPosition(), last.getYPosition()));
+    private boolean lastPointOpen(Point last) {
+        return toVisit.contains(last);
     }
 
-    public void move(Robot robot, StarNode node) {
+    private void move(Robot robot, StarNode node) {
         if (robot.direction == Direction.EAST || robot.direction == Direction.WEST) {
             //we are facing left or right and want to turn if we gonna move up or down
             if (node.getYPosition() > robot.position.getY()) {
@@ -162,7 +163,7 @@ public class State {
     }
 
     private void spawnNewRobot(Robot robot) {
-        Robot newBot = new Robot(Point.of(robot.position.getX(), robot.position.getY()));
+        Robot newBot = new Robot(robot.position);
         robot.useBooster(BoosterCode.C);
         robots.add(newBot);
     }

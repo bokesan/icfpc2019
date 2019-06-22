@@ -127,21 +127,8 @@ public class Robot {
         switch(boosterCode){
             case B:
                 // attach to side of existing manipulators
-                Direction origDir = direction;
-                while (direction != Direction.EAST)
-                    turnLeft();
-                Point p;
-                for (int offs = 2; ; offs++) {
-                    p = position.translate(1, offs);
-                    if (!manipulators.contains(p))
-                        break;
-                    p = position.translate(1, -offs);
-                    if (!manipulators.contains(p))
-                        break;
-                }
+                Point p = attachManipulator();
                 manipulators.add(p);
-                while (direction != origDir)
-                    turnLeft();
                 log(Actions.B, Point.of(p.getX() - position.getX(), p.getY() - position.getY()));
                 break;
             case F:
@@ -159,6 +146,51 @@ public class Robot {
         }
         return true;
     }
+
+    private Point attachManipulator() {
+        Point p;
+        switch (direction) {
+            case EAST:
+                for (int offs = 2; ; offs++) {
+                    p = position.translate(1, offs);
+                    if (!manipulators.contains(p))
+                        return p;
+                    p = position.translate(1, -offs);
+                    if (!manipulators.contains(p))
+                        return p;
+                }
+            case WEST:
+                for (int offs = 2; ; offs++) {
+                    p = position.translate(-1, offs);
+                    if (!manipulators.contains(p))
+                        return p;
+                    p = position.translate(-1, -offs);
+                    if (!manipulators.contains(p))
+                        return p;
+                }
+            case NORTH:
+                for (int offs = 2; ; offs++) {
+                    p = position.translate(offs, 1);
+                    if (!manipulators.contains(p))
+                        return p;
+                    p = position.translate(-offs, 1);
+                    if (!manipulators.contains(p))
+                        return p;
+                }
+            case SOUTH:
+                for (int offs = 2; ; offs++) {
+                    p = position.translate(offs, -1);
+                    if (!manipulators.contains(p))
+                        return p;
+                    p = position.translate(-offs, -1);
+                    if (!manipulators.contains(p))
+                        return p;
+                }
+            default:
+                throw new AssertionError();
+        }
+    }
+
 
     private void turnLeft(){
         Direction manipulationWay = null;

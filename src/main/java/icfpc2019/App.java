@@ -25,7 +25,7 @@ public class App {
             String targetDir = args[1];
             Arrays.stream(args, 2, args.length)
                     .parallel()
-                    .forEach(p -> safeSolveProblem(p, replaceDir(p, targetDir)));
+                    .forEach(p -> safeSolveProblem(p, targetFile(p, targetDir)));
         } else if (args.length > 1) {
             solveProblem(args[0], args[1]);
         } else {
@@ -45,6 +45,7 @@ public class App {
     private static void solveProblem(String problemFile, String solutionFile) throws IOException {
         String desc = readFile(problemFile, StandardCharsets.UTF_8);
         ProblemDesc problem = ProblemDesc.of(desc);
+        System.out.format("Starting solver for %s ...\n", problemFile);
         Grid grid = Grid.of(problem);
         Pathfinder finder = new Pathfinder();
         finder.initNodes(grid);
@@ -65,11 +66,12 @@ public class App {
                 }
             }
         }
-        System.out.println("Solution length: " + combineResults(state).length());
-
-        if (solutionFile != null) {
-            writeFile(solutionFile, combineResults(state));
-            System.out.println("Solution written to: " + solutionFile);
+        String result = combineResults(state);
+        if (solutionFile == null) {
+            System.out.format("Solution length: %d\n", result.length());
+        } else {
+            writeFile(solutionFile, result);
+            System.out.format("Solution written to %s, length: %d\n", solutionFile, result.length());
         }
     }
 
@@ -94,7 +96,10 @@ public class App {
         return new String(encoded, encoding);
     }
 
-    private static String replaceDir(String path, String dir) {
+    private static String targetFile(String path, String dir) {
+        if (path.endsWith(".desc")) {
+            path = path.substring(0, path.length() - 4) + "sol";
+        }
         int p = path.lastIndexOf('/');
         if (p < 0) {
             return dir + "/" + path;

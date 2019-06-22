@@ -107,14 +107,8 @@ public class Pathfinder{
 
     private List<StarNode> calcPath(StarNode start, StarNode goal) {
         LinkedList<StarNode> path = new LinkedList<>();
-        StarNode curr = goal;
-        boolean done = false;
-        while (!done) {
+        for (StarNode curr = goal; !curr.equals(start); curr = curr.getPrevious()) {
             path.addFirst(curr);
-            curr = curr.getPrevious();
-            if (curr.equals(start)) {
-                done = true;
-            }
         }
         return path;
     }

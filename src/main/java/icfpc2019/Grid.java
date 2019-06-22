@@ -35,12 +35,14 @@ public class Grid {
     }
 
     private static void setSquares(boolean[][] fields, List<Point> shape, List<List<Point>> shapes) {
-        List<List<Point>> allShapes = new ArrayList<>();
-        allShapes.add(shape);
-        allShapes.addAll(shapes);
-        List<Line> lines = linesFromShapes(allShapes);
+        List<Line> lines = new ArrayList<>(100);
+        linesFromShape(lines, shape);
+        for (List<Point> s : shapes) {
+            linesFromShape(lines, s);
+        }
+        int height = fields[0].length;
         for (int x = 0; x < fields.length; x++) {
-            for (int y = 0; y < fields[0].length; y++) {
+            for (int y = 0; y < height; y++) {
                 fields[x][y] = calculateIsFree(x, y, lines);
             }
         }
@@ -57,20 +59,21 @@ public class Grid {
             }
         }
         //System.out.println("up: " + up + " - right: " + right);
-        return (up % 2 == 1) && (right % 2 == 1);
+        return odd(up) && odd(right);
     }
 
-    private static List<Line> linesFromShapes(List<List<Point>> shapes) {
-        List<Line> lines = new ArrayList<>();
-        for (List<Point> shape : shapes) {
-            for (int i = 1; i < shape.size(); i++) {
-                lines.add(Line.of(shape.get(i - 1), shape.get(i)));
-                //System.out.println(Line.of(shape.get(i - 1), shape.get(i)));
-            }
-            lines.add(Line.of(shape.get(0), shape.get(shape.size() - 1)));
-            //System.out.println(Line.of(shape.get(0), shape.get(shape.size() - 1)));
+    private static boolean odd(int n) {
+        return (n & 1) != 0;
+    }
+
+    private static void linesFromShape(List<Line> lines, List<Point> shape) {
+        int n = shape.size();
+        for (int i = 1; i < n; i++) {
+            lines.add(Line.of(shape.get(i - 1), shape.get(i)));
+            //System.out.println(Line.of(shape.get(i - 1), shape.get(i)));
         }
-        return lines;
+        lines.add(Line.of(shape.get(0), shape.get(shape.size() - 1)));
+        //System.out.println(Line.of(shape.get(0), shape.get(shape.size() - 1)));
     }
 
     public boolean isFree(int x, int y) {

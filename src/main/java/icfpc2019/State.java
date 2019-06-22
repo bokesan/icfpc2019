@@ -79,6 +79,17 @@ public class State {
         }
         robot.move(point);
         removePointsToVisit();
+        collectBooster();
+    }
+
+    private void collectBooster() {
+        for (BoosterLocation booster : gridBoosters) {
+            if (booster.getPoint().equals(robot.position)) {
+                robot.addBooster(booster.getBoosterCode());
+                gridBoosters.remove(booster);
+                break;
+            }
+        }
     }
 
     public boolean mapFinished() {

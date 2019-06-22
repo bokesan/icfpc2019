@@ -44,7 +44,7 @@ public class Pathfinder{
                 StarNode currentAdj = adjacentNodes.get(i);
                 if(!openList.contains(currentAdj)){
                     currentAdj.setPrevious(current);
-                    currentAdj.sethCosts(nodes[end.getX()][end.getY()]);
+                    currentAdj.sethCosts(nodes[start.getX()][start.getY()], nodes[end.getX()][end.getY()]);
                     if(isDirectionChange(current, currentAdj) && !currentAdj.isTeleport()){
                         currentAdj.setMovementPanelty(penalty);
                     }
@@ -124,7 +124,6 @@ public class Pathfinder{
         return path;
     }
     private StarNode lowestFInOpen() {
-
         StarNode cheapest = openList.get(0);
         for (int i = 0; i < openList.size(); i++) {            
             if (openList.get(i).getfCosts() < cheapest.getfCosts()) {

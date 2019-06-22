@@ -37,6 +37,14 @@ public class StarNode {
         int dy = absolute(this.getYPosition() - starNode.getYPosition());
         this.hCosts = (int) (BASICMOVEMENTCOST * Math.sqrt(dx * dx + dy * dy));
     }
+    public void sethCosts(StarNode start, StarNode goal){
+        int dx1 = this.getXPosition() - goal.getXPosition();
+        int dy1 = this.getYPosition() - goal.getYPosition();
+        int dx2 = start.getXPosition() - goal.getXPosition();
+        int dy2 = start.getYPosition() - goal.getYPosition();
+        int cross = absolute(dx1*dy2 - dx2*dy1);
+        this.hCosts += cross*0.001;
+    }
     private void setgCosts(int gCosts) {               
         this.gCosts = gCosts + movementPenalty;                
     }

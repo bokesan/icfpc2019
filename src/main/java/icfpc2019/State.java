@@ -32,7 +32,7 @@ public class State {
     private void addPointsToVisit() {
         for (int x = 0; x < grid.max.getX(); x++) {
             for (int y = 0; y < grid.max.getY(); y++) {
-                if (grid.isFree(Point.of(x, y))) {
+                if (grid.isFree(x, y)) {
                     toVisit.add(Point.of(x, y));
                 }
             }

@@ -1,6 +1,7 @@
 package icfpc2019;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Grid {
@@ -21,18 +22,14 @@ public class Grid {
         setSquares(fields, problemDesc.getMap(), problemDesc.getObstacles());
         return new Grid(fields, problemDesc.getMin(), problemDesc.getMax());
     }
-    public static Grid of(int xMax, int yMax, int xGapPosition,int yGapPosition){
 
+    public static Grid of(int xMax, int yMax, Point... obstacles) {
         boolean[][] fields = new boolean[xMax][yMax];
-        for(int x = 0; x < xMax; x++){
-            for(int y = 0; y < yMax; y++){
-                if(x == xGapPosition && y != yGapPosition){
-                    fields[x][y] = false;
-                }else{
-                    fields[x][y] = true;
-                }
-
-            }
+        for (int x = 0; x < xMax; x++) {
+            Arrays.fill(fields[x], true);
+        }
+        for (Point p : obstacles) {
+            fields[p.getX()][p.getY()] = false;
         }
         return new Grid(fields, Point.origin(), Point.of(xMax, yMax));
     }
@@ -76,12 +73,16 @@ public class Grid {
         return lines;
     }
 
-    public boolean isFree(Point p) {
-        if (p.getX() > max.getX() || p.getX() < min.getX() || p.getY() > max.getY() || p.getY() < min.getY()) {
+    public boolean isFree(int x, int y) {
+        if (x > max.getX() || x < min.getX() || y > max.getY() || y < min.getY()) {
             return false;
         } else {
-            return fields[p.getX()][p.getY()];
+            return fields[x][y];
         }
+    }
+
+    public boolean isFree(Point p) {
+        return isFree(p.getX(), p.getY());
     }
 
     public boolean[][] getFields(){
@@ -101,6 +102,46 @@ public class Grid {
             builder.append('\n');
         }
         return builder.toString();
+    }
+
+    /**
+     * Are the centers of the squares denoted by p1 and p2 visible from each other?
+     */
+    public boolean visible(Point p1, Point p2) {
+        if (!(isFree(p1) && isFree(p2))) {
+            return false;
+        }
+        if (p1.equals(p2)) {
+            return true;
+        }
+        int dx = p2.getX() - p1.getX();
+        int dy = p2.getY() - p1.getY();
+        int nx = Math.abs(dx);
+        int ny = Math.abs(dy);
+        if (nx > ny) {
+            // move in x dir
+            int xstep = (int) Math.signum(dx);
+            double ystep = (double) dy / nx;
+            for (int offs = 1; offs < nx; offs++) {
+                int x = p1.getX() + offs * xstep;
+                double y = p1.getY() + 0.5 + (offs - 0.5 * xstep) * ystep;
+                if (!isFree(x, (int) y)) {
+                    return false;
+                }
+            }
+        } else {
+            // move in y dir
+            int ystep = (int) Math.signum(dy);
+            double xstep = (double) dx / ny;
+            for (int offs = 1; offs < ny; offs++) {
+                int y = p1.getY() + offs * ystep;
+                double x = p1.getX() + 0.5 + (offs - 0.5 * ystep) * xstep;
+                if (!isFree((int) x, y)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 }

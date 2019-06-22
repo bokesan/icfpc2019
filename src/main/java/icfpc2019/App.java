@@ -6,7 +6,6 @@ import icfpc2019.pathfinder.StarNode;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -29,10 +28,7 @@ public class App {
                         .parallel()
                         .forEach(p -> safeSolveProblem(p, targetFile(p, targetDir)));
             } else {
-                SortedSet<String> problems = new TreeSet<>();
-                for (int i = 2; i < args.length; i++) {
-                    problems.add(args[i]);
-                }
+                SortedSet<String> problems = new TreeSet<>(Arrays.asList(args).subList(2, args.length));
                 for (String p : problems) {
                     safeSolveProblem(p, targetFile(p, targetDir));
                 }
@@ -55,7 +51,7 @@ public class App {
 
     private static void solveProblem(String problemFile, String solutionFile) throws IOException {
         long startTime = System.nanoTime();
-        String desc = readFile(problemFile, StandardCharsets.UTF_8);
+        String desc = readFile(problemFile);
         ProblemDesc problem = ProblemDesc.of(desc);
         System.out.format("Starting solver for %s ...\n", problemFile);
         Grid grid = Grid.of(problem);
@@ -67,13 +63,14 @@ public class App {
             int numRobots = state.getNumRobots();
             for (int i = 0; i < numRobots; i++) {
                 Robot r = state.getRobot(i);
-                Point next = state.getNextPointToVisit(r);
+                Point next = state.getNextPointToVisit(r, i == 0);
                 if (next == null) continue;
-                List<StarNode> starPath = finder.findPath(state.getCurrentPosition(r), next, 10);
+                List<StarNode> starPath = finder.findPath(state.getCurrentPosition(r), next, 10, i == 0);
                 if (starPath.isEmpty()) {
                     System.out.format("Empty path for robot %d/%d at %s\n", i, numRobots, r.position);
                 }
-                state.move(r, starPath);
+                if (starPath.size() > 21) starPath = starPath.subList(0, 20);
+                state.move(r, starPath, i == 0);
             }
         }
         String result = combineResults(state);
@@ -103,9 +100,9 @@ public class App {
         writer.close();
     }
 
-    private static String readFile(String path, Charset encoding) throws IOException {
+    private static String readFile(String path) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return new String(encoded, encoding);
+        return new String(encoded, StandardCharsets.UTF_8);
     }
 
     private static String targetFile(String path, String dir) {

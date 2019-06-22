@@ -20,7 +20,7 @@ public class Robot {
         manipulators = new ArrayList<>();
         gatheredBosters = new LinkedList<>();
         initBaseManipulators();
-        direction = Direction.EAST;  
+        direction = Direction.EAST;
     }
 
     private void initBaseManipulators(){
@@ -34,7 +34,7 @@ public class Robot {
             throw new ExtensionException("Already extended");
         }
         manipulators.add(manipulatorExtension);
-    }    
+    }
 
     public void move(StarNode node){
         int dx = node.getXPosition() - position.getX();
@@ -43,7 +43,7 @@ public class Robot {
         if (dy == 0 && !node.isTeleport()) {
             switch (dx) {
                 case -1:  action = Actions.A; break;
-                case 1:   action = Actions.D; break;                
+                case 1:   action = Actions.D; break;
                 default: throw new InvalidMoveException(position, node.getAsPoint());
             }
         } else if (dx == 0 && !node.isTeleport()) {
@@ -61,7 +61,7 @@ public class Robot {
             log(action, node.getAsPoint());
         } else {
             log(action);
-        }        
+        }
         moveManipulators(dx, dy);
         countTimeUnit();
         position = node.getAsPoint();
@@ -83,47 +83,48 @@ public class Robot {
 
     private void log(Actions action) {
         log.append(action.toString());
+        //System.out.print(action.toString());
     }
 
     private void log(Actions action, Point target){
         log.append(action.toString()).append("(").append(target.getX()).append(",").append(target.getY()).append(")");
+        //System.out.print(action.toString()+"("+target.getX()+","+target.getY()+")");
     }
 
-    public void spin(Actions action) {
+    void spin(Actions action) {
         switch (action) {
             case E:
-                turnRight();            
+                turnRight();
                 log(action);
                 countTimeUnit();
                 break;
             case Q:
                 turnLeft();
-                log(action); 
-                countTimeUnit();                
+                log(action);
+                countTimeUnit();
                 break;
             default:
                 throw new AssertionError();
         }
     }
 
-    public void addBooster(BoosterCode boosterCode){
+    void addBooster(BoosterCode boosterCode){
         gatheredBosters.add(boosterCode);
     }
 
-    public List<BoosterCode> getGatheredBoosters(){
+    List<BoosterCode> getGatheredBoosters(){
         return gatheredBosters;
     }
 
-    public boolean useBooster(BoosterCode boosterCode){
+    void useBooster(BoosterCode boosterCode){
         countTimeUnit();
         if(gatheredBosters.contains(boosterCode)){
             gatheredBosters.remove(boosterCode);
-            return boost(boosterCode);
+            boost(boosterCode);
         }
-        return false;
     }
 
-    private boolean boost(BoosterCode boosterCode) {
+    private void boost(BoosterCode boosterCode) {
         switch(boosterCode){
             case B:
                 // attach to side of existing manipulators
@@ -137,14 +138,13 @@ public class Robot {
             case L:
                 drillUnits = 30;
                 break;
-            case R:                
+            case R:
                 log(Actions.R);
                 break;
             case C:
                 log(Actions.C);
                 break;
         }
-        return true;
     }
 
     private Point attachManipulator() {
@@ -224,7 +224,7 @@ public class Robot {
         turnLeft();
     }
 
-    public String getActionLog() {
+    String getActionLog() {
         return log.toString();
     }
 
@@ -233,13 +233,13 @@ public class Robot {
     }
 
     public static class ExtensionException extends RuntimeException {
-        public ExtensionException(String msg){
+        ExtensionException(String msg){
             super(msg);
         }
     }
 
     public static class InvalidMoveException extends RuntimeException {
-        public InvalidMoveException(Point position, Point newPosition) {
+        InvalidMoveException(Point position, Point newPosition) {
             super("invalid move attempted from " + position + " to " + newPosition);
         }
     }

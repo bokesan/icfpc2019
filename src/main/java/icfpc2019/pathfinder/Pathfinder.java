@@ -27,7 +27,7 @@ public class Pathfinder{
         }
     }
 
-    public final List<StarNode> findPath(Point start, Point end, int penalty) {
+    public final List<StarNode> findPath(Point start, Point end, int penalty, boolean mayTeleport) {
         openList.clear();
         closedList = new HashSet<>();
         openList.add(nodes[start.getX()][start.getY()]);
@@ -40,7 +40,7 @@ public class Pathfinder{
             if ((current.getXPosition() == end.getX()) && (current.getYPosition() == end.getY())) {
                 return calcPath(nodes[start.getX()][start.getY()], current);
             }
-            List<StarNode> adjacentNodes = getAdjacent(current);
+            List<StarNode> adjacentNodes = getAdjacent(current, mayTeleport);
             for (StarNode currentAdj : adjacentNodes) {
                 if (!openList.contains(currentAdj)) {
                     currentAdj.setPrevious(current);
@@ -60,10 +60,10 @@ public class Pathfinder{
         }
     }
 
-    private ArrayList<StarNode> getAdjacent(StarNode current) {
+    private ArrayList<StarNode> getAdjacent(StarNode current, boolean mayTeleport) {
         int x = current.getXPosition();
         int y = current.getYPosition();
-        ArrayList<StarNode> adj = new ArrayList<StarNode>();
+        ArrayList<StarNode> adj = new ArrayList<>();
         StarNode temp;
         if (x > 0) {
             temp = nodes[x-1][y];
@@ -84,12 +84,13 @@ public class Pathfinder{
             temp = nodes[x][y+1];
             tryAddTempToAdjacent(adj, temp);
         }
-        for (Point p : teleporters) {
-            StarNode teleporterNode = nodes[p.getX()][p.getY()];
-            teleporterNode.setIsTeleport(true);
-            tryAddTempToAdjacent(adj, teleporterNode);
+        if (mayTeleport) {
+            for (Point p : teleporters) {
+                StarNode teleporterNode = nodes[p.getX()][p.getY()];
+                teleporterNode.setIsTeleport(true);
+                tryAddTempToAdjacent(adj, teleporterNode);
+            }
         }
-
         return adj;
     }
     private void tryAddTempToAdjacent(ArrayList<StarNode> adj, StarNode temp){

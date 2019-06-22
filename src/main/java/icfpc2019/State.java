@@ -8,7 +8,7 @@ import icfpc2019.pathfinder.StarNode;
 
 import static icfpc2019.BoosterCode.*;
 
-public class State {
+class State {
 
     private List<BoosterLocation> gridBoosters;
     private Grid grid;
@@ -16,7 +16,7 @@ public class State {
     private List<Robot> robots = new ArrayList<>();
     private Pathfinder finder;
 
-    public State(Grid grid, Robot robot, List<BoosterLocation> boosters, Pathfinder finder) {
+    State(Grid grid, Robot robot, List<BoosterLocation> boosters, Pathfinder finder) {
         this.grid = grid;
         this.robots.add(robot);
         this.gridBoosters = boosters;
@@ -35,7 +35,7 @@ public class State {
         }
     }
 
-    public Point getNextPointToVisit(Robot robot) {
+    Point getNextPointToVisit(Robot robot, boolean mayTeleport) {
         if (toVisit.isEmpty()) return null;
         List<Point> targets = toVisit;
         boolean complexMode = false;
@@ -60,77 +60,56 @@ public class State {
         List<Point> boostersOfInterest = new ArrayList<>();
 
         for (BoosterLocation booster : gridBoosters) {
-            if (booster.getBoosterCode() == R) teleports.add(booster.getPoint());
+            if (mayTeleport && booster.getBoosterCode() == R) teleports.add(booster.getPoint());
             if (booster.getBoosterCode() == B || booster.getBoosterCode() == C) boostersOfInterest.add(booster.getPoint());
         }
         if (!teleports.isEmpty() && !boostersOfInterest.isEmpty()){
-             int bestTeleportDistance = getBestDistance(bestPointFromTargets(teleports, robot, true), robot.position, true);
-             int bestBoosterDistance = getBestDistance(bestPointFromTargets(boostersOfInterest, robot, true), robot.position, true);
+            int bestTeleportDistance = getBestDistance(bestPointFromTargets(teleports, robot, false, mayTeleport), robot.position, false, mayTeleport);
+            int bestBoosterDistance = getBestDistance(bestPointFromTargets(boostersOfInterest, robot, false, mayTeleport), robot.position, false, mayTeleport);
             if(bestTeleportDistance > bestBoosterDistance){
                 targets = boostersOfInterest;
-                complexMode = true;
+                complexMode = false;
             } else {
                 targets = teleports;
-                complexMode = true;
-            }            
-        } else if(teleports.isEmpty() &&!boostersOfInterest.isEmpty()) {
+                complexMode = false;
+            }
+        } else if(teleports.isEmpty() && !boostersOfInterest.isEmpty()) {
             targets = boostersOfInterest;
-            complexMode = true;
+            complexMode = false;
         } else if (!teleports.isEmpty()) {
             targets = teleports;
-            complexMode = true;
+            complexMode = false;
         }
-        return bestPointFromTargets(targets, robot, complexMode);
+        return bestPointFromTargets(targets, robot, complexMode, mayTeleport);
     }
 
-    private Point bestPointFromTargets(List<Point> targets, Robot robot, boolean complexMode) {
+    private Point bestPointFromTargets(List<Point> targets, Robot robot, boolean complexMode, boolean mayTeleport) {
         Point best = targets.get(0);
         Point current = robot.position;
-        int bestDistance = getBestDistance(best, current, complexMode);
+        int bestDistance = getBestDistance(best, current, complexMode, mayTeleport);
 
         for (Point p : targets) {
-            int distance = getBestDistance(current, p, complexMode);
+            int distance = getBestDistance(current, p, complexMode, mayTeleport);
             if (distance < bestDistance) {
                 bestDistance = distance;
-                best = p;                
-            }        
+                best = p;
+            }
         }
         return best;
     }
 
-    private int getBestDistance(Point best, Point current, boolean complexMode) {
-        if (complexMode) return finder.findPath(best, current, 0).size();
+    private int getBestDistance(Point best, Point current, boolean complexMode, boolean mayTeleport) {
+        if (complexMode) return finder.findPath(best, current, 0, mayTeleport).size();
         return Math.abs(best.getX() - current.getX()) + Math.abs(best.getY() - current.getY());
     }
 
-    public void move(Robot robot, List<StarNode> path) {
-        StarNode last = path.get(path.size() - 1);
+    void move(Robot robot, List<StarNode> path, boolean mayTeleport) {
         for (StarNode point : path) {
-            Point p = last.getAsPoint();
-            if (!lastPointOpen(p) && !lastPointRelevant(p)) break;
-            move(robot, point);
+            move(robot, point, mayTeleport);
         }
     }
 
-    private boolean lastPointRelevant(Point lastPoint) {
-        for (BoosterLocation booster : gridBoosters) {
-            if (booster.getBoosterCode() == BoosterCode.X ||
-                booster.getBoosterCode() == R ||
-                booster.getBoosterCode() == BoosterCode.C ||
-                booster.getBoosterCode() == BoosterCode.B) {
-                if (booster.getPoint().equals(lastPoint)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean lastPointOpen(Point last) {
-        return toVisit.contains(last);
-    }
-
-    private void move(Robot robot, StarNode node) {
+    private void move(Robot robot, StarNode node, boolean mayTeleport) {
         if (robot.direction == Direction.EAST || robot.direction == Direction.WEST) {
             //we are facing left or right and want to turn if we gonna move up or down
             if (node.getYPosition() > robot.position.getY()) {
@@ -148,7 +127,7 @@ public class State {
         }
         robot.move(node);
         removePointsToVisit(robot);
-        collectBooster(robot);
+        collectBooster(robot, mayTeleport);
         checkSpawningOpportunity(robot);
     }
 
@@ -168,13 +147,14 @@ public class State {
         robots.add(newBot);
     }
 
-    private void collectBooster(Robot robot) {
+    private void collectBooster(Robot robot, boolean mayTeleport) {
         for (BoosterLocation booster : gridBoosters) {
             if (booster.getBoosterCode() != BoosterCode.X && booster.getPoint().equals(robot.position)) {
                 robot.addBooster(booster.getBoosterCode());
                 gridBoosters.remove(booster);
                 switch (booster.getBoosterCode()) {
                     case R:
+                        if (!mayTeleport) break;
                         robot.useBooster(booster.getBoosterCode());
                         finder.addTeleport(robot.position);
                         break;
@@ -189,19 +169,19 @@ public class State {
         }
     }
 
-    public boolean mapFinished() {
+    boolean mapFinished() {
         return toVisit.isEmpty();
     }
 
-    public String getResult(Robot robot) {
+    String getResult(Robot robot) {
         return robot.getActionLog();
     }
 
-    public Point getCurrentPosition(Robot robot) {
+    Point getCurrentPosition(Robot robot) {
         return robot.position;
     }
 
-    public void turn(Robot robot, boolean left) {
+    private void turn(Robot robot, boolean left) {
         if (left) {
             robot.spin(Actions.Q);
         } else {
@@ -210,11 +190,11 @@ public class State {
         removePointsToVisit(robot);
     }
 
-    public int getNumRobots() {
+    int getNumRobots() {
         return robots.size();
     }
 
-    public Robot getRobot(int index) {
+    Robot getRobot(int index) {
         return robots.get(index);
     }
 }

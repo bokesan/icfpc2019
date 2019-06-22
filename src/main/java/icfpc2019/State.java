@@ -44,6 +44,12 @@ public class State {
             targets = new ArrayList<>();
             for (BoosterLocation booster : gridBoosters) {
                 if (booster.getBoosterCode() == BoosterCode.X) {
+                    if (booster.getPoint().equals(robot.position)) {
+                        robot.useBooster(C);
+                        targets.clear();
+                        complexMode = false;
+                        break;
+                    }
                     targets.add(booster.getPoint());
                     complexMode = true;
                 }

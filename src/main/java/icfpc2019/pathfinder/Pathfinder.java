@@ -27,11 +27,6 @@ public class Pathfinder{
                 nodes[x][y] = temp;
             }
         }
-        for (BoosterLocation booster : boosters) {
-            
-            StarNode node = nodes[booster.getPoint().getX()][booster.getPoint().getX()];
-            node.setMovementPanelty(-10000);
-        }
     }
     public final List<StarNode> findPath(Point start, Point end, int penalty){
         openList = new LinkedList<>();
@@ -53,7 +48,7 @@ public class Pathfinder{
                     currentAdj.setPrevious(current);
                     currentAdj.sethCosts(nodes[start.getX()][start.getY()], nodes[end.getX()][end.getY()]);
                     if(isDirectionChange(current, currentAdj) && !currentAdj.isTeleport()){
-                        currentAdj.setMovementPanelty(penalty);
+                        // currentAdj.setMovementPanelty(penalty);
                     }
                     currentAdj.setgCosts(current);
                     openList.add(currentAdj);

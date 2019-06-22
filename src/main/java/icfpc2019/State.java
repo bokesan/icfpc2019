@@ -51,17 +51,24 @@ public class State {
             if (targets.isEmpty()) targets = toVisit;
         }
         List<Point> teleports = new ArrayList<>();
+        List<Point> boostersOfInterest = new ArrayList<>();
         for (BoosterLocation booster : gridBoosters) {
             if (booster.getBoosterCode() == R) teleports.add(booster.getPoint());
+            if (booster.getBoosterCode() == BoosterCode.B) boostersOfInterest.add(booster.getPoint());
         }
         if (!teleports.isEmpty()) {
             targets = teleports;
             complexMode = true;
+        }else if(teleports.isEmpty() && !boostersOfInterest.isEmpty()){
+            targets = boostersOfInterest;
+            complexMode = true;
         }
-
+        
         Point best = targets.get(0);
         Point current = robot.position;
         int bestDistance = getBestDistance(best, current, complexMode);
+
+
         for (Point p : targets) {
             int distance = getBestDistance(current, p, complexMode);
             if (distance < bestDistance) {
@@ -70,6 +77,13 @@ public class State {
             }
         }
         return best;
+    }
+    private boolean isValidBoosterPoint(Point possibleTarget){
+        BoosterLocation booster = gridBoosters.stream().filter(gb -> gb.getPoint().equals(possibleTarget)).findAny().orElse(null);
+        if(booster != null){
+            return true;
+        }else
+            return false;
     }
 
     private int getBestDistance(Point best, Point current, boolean complexMode) {

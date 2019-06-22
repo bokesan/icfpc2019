@@ -116,11 +116,71 @@ public class Grid {
         return result;
     }
 
+    public boolean visible(Point p1, Point p2) {
+        if (!(isFree(p1) && isFree(p2))) {
+            return false;
+        }
+        if (p1.equals(p2)) {
+            return true;
+        }
+
+        int dx = p2.getX() - p1.getX();
+        int dy = p2.getY() - p1.getY();
+
+
+        if (dy == 1) {
+            if (dx == 2 && !(isFree(p1.right()) && isFree(p1.right().up())))
+                return false;
+            if (dx == -2 && !(isFree(p1.left()) && isFree(p1.left().up())))
+                return false;
+
+            if (dx == 3 && !(isFree(p1.right()) && isFree(p1.translate(2, 1))))
+                return false;
+            if (dx == -3 && !(isFree(p1.left()) && isFree(p1.translate(-2, 1))))
+                return false;
+
+        }
+        else if (dy == -1) {
+            if (dx == 2 && !(isFree(p1.right()) && isFree(p1.right().down())))
+                return false;
+            if (dx == -2 && !(isFree(p1.left()) && isFree(p1.left().down())))
+                return false;
+
+            if (dx == 3 && !(isFree(p1.right()) && isFree(p1.translate(2, -1))))
+                return false;
+            if (dx == -3 && !(isFree(p1.left()) && isFree(p1.translate(-2, -1))))
+                return false;
+
+        }
+        else if (dx == 1) {
+            if (dy == 2 && !(isFree(p1.up()) && isFree(p1.up().right())))
+                return false;
+            if (dy == -2 && !(isFree(p1.down()) && isFree(p1.down().right())))
+                return false;
+            if (dy == 3 && !(isFree(p1.up()) && isFree(p1.translate(1, 2))))
+                return false;
+            if (dy == -3 && !(isFree(p1.down()) && isFree(p1.translate(1, -2))))
+                return false;
+        } else if (dx == -1) {
+            if (dy == 2 && !(isFree(p1.up()) && isFree(p1.up().left())))
+                return false;
+            if (dy == -2 && !(isFree(p1.down()) && isFree(p1.down().left())))
+                return false;
+            if (dy == 3 && !(isFree(p1.up()) && isFree(p1.translate(-1, 2))))
+                return false;
+            if (dy == -3 && !(isFree(p1.down()) && isFree(p1.translate(-1, -2))))
+                return false;
+        } else {
+            throw new RuntimeException("should not happen with the way we place manipulators: " + dx + "," + dy);
+        }
+        return true;
+    }
+
 
     /**
      * Are the centers of the squares denoted by p1 and p2 visible from each other?
      */
-    public boolean visible(Point p1, Point p2) {
+    public boolean visibleX(Point p1, Point p2) {
         if (!(isFree(p1) && isFree(p2))) {
             return false;
         }

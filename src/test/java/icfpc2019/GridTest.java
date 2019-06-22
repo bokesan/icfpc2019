@@ -50,7 +50,7 @@ public class GridTest {
 
     @Test
     public void testVisible3_1() {
-        Grid grid = Grid.of(30, 30,Point.of(11, 20));
+        Grid grid = Grid.of(30, 30, Point.of(11, 20));
         Point p1 = Point.of(10, 20);
         Point p2 = p1.translate(3, -1);
         assertFalse(grid.visible(p1, p2));

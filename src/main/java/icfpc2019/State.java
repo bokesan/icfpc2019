@@ -49,9 +49,9 @@ public class State {
 
         Point best = targets.get(0);
         Point current = robot.position;
-        int bestDistance = finder.findPath(best, current, 0).size();
+        int bestDistance = Math.abs(best.getX() - current.getX()) + Math.abs(best.getY() - current.getY());
         for (Point p : targets) {
-            int distance = finder.findPath(p, current, 0).size();
+            int distance = Math.abs(current.getX() - p.getX()) + Math.abs(current.getY() - p.getY());
             if (distance < bestDistance) {
                 bestDistance = distance;
                 best = p;

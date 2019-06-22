@@ -44,7 +44,7 @@ public class App {
 
         while (!state.mapFinished()) {
             Point next = state.getNextPointToVisit();
-            List<StarNode> starPath = finder.findPath(state.getCurrentPosition(), next);
+            List<StarNode> starPath = finder.findPath(state.getCurrentPosition(), next, 0);
             List<Point> path = pathFromStarNodes(starPath);
             state.move(path);
         }

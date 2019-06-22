@@ -26,7 +26,7 @@ public class Pathfinder{
             }
         }
     }
-    public final List<StarNode> findPath(Point start, Point end){
+    public final List<StarNode> findPath(Point start, Point end, int penalty){
         openList = new LinkedList<>();
         closedList = new LinkedList<>();
         openList.add(nodes[start.getX()][start.getY()]);
@@ -46,7 +46,7 @@ public class Pathfinder{
                     currentAdj.setPrevious(current);
                     currentAdj.sethCosts(nodes[end.getX()][end.getY()]);
                     if(isDirectionChange(current, currentAdj)){
-                        currentAdj.setMovementPanelty(17);
+                        currentAdj.setMovementPanelty(penalty);
                     }
                     currentAdj.setgCosts(current);
                     openList.add(currentAdj);

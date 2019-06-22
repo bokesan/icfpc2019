@@ -8,18 +8,18 @@ public class State {
     private List<BoosterLocation> gridBoosters;
     private Grid grid;
     private List<Point> toVisit;
-    private Robot robot;
+    private List<Robot> robots = new ArrayList<>();
 
     public State(Grid grid, Robot robot, List<BoosterLocation> boosters) {
         this.grid = grid;
-        this.robot = robot;
+        this.robots.add(robot);
         this.gridBoosters = boosters;
         this.toVisit = new ArrayList<>();
         addPointsToVisit();
-        removePointsToVisit();
+        removePointsToVisit(robot);
     }
 
-    private void removePointsToVisit() {
+    private void removePointsToVisit(Robot robot) {
         List<Point> touched = new ArrayList<>();
         touched.add(robot.position);
         // FIXME: check visibility
@@ -39,7 +39,7 @@ public class State {
         }
     }
 
-    public Point getNextPointToVisit() {
+    public Point getNextPointToVisit(Robot robot) {
         if (toVisit.isEmpty()) return null;
         Point best = toVisit.get(0);
         Point current = robot.position;
@@ -54,38 +54,38 @@ public class State {
         return best;
     }
 
-    public void move(List<Point> path) {
+    public void move(Robot robot, List<Point> path) {
         Point last = path.get(path.size() - 1);
         for (Point point : path) {
             if (!toVisit.contains(last)) break;
-            move(point);
+            move(robot, point);
         }
     }
 
-    private void move(Point point) {
+    private void move(Robot robot, Point point) {
         if (robot.direction == Direction.EAST || robot.direction == Direction.WEST) {
             //we are facing left or right and want to turn if we gonna move up or down
             if (point.getY() > robot.position.getY()) {
-                turn(robot.direction == Direction.EAST);
+                turn(robot,robot.direction == Direction.EAST);
             } else if (point.getY() < robot.position.getY()) {
-                turn(robot.direction == Direction.WEST);
+                turn(robot,robot.direction == Direction.WEST);
             }
         } else {
             //we are facing up or down and want to turn if we gonna move left or right
             if (point.getX() > robot.position.getX()) {
-                turn(robot.direction == Direction.SOUTH);
+                turn(robot,robot.direction == Direction.SOUTH);
             } else if (point.getX() < robot.position.getX()) {
-                turn(robot.direction == Direction.NORTH);
+                turn(robot,robot.direction == Direction.NORTH);
             }
         }
         robot.move(point);
-        removePointsToVisit();
-        collectBooster();
+        removePointsToVisit(robot);
+        collectBooster(robot);
     }
 
-    private void collectBooster() {
+    private void collectBooster(Robot robot) {
         for (BoosterLocation booster : gridBoosters) {
-            if (booster.getPoint().equals(robot.position)) {
+            if (booster.getBoosterCode() != BoosterCode.X && booster.getPoint().equals(robot.position)) {
                 robot.addBooster(booster.getBoosterCode());
                 gridBoosters.remove(booster);
                 break;
@@ -97,20 +97,28 @@ public class State {
         return toVisit.isEmpty();
     }
 
-    public String getResult() {
+    public String getResult(Robot robot) {
         return robot.getActionLog();
     }
 
-    public Point getCurrentPosition() {
+    public Point getCurrentPosition(Robot robot) {
         return robot.position;
     }
 
-    public void turn(boolean left) {
+    public void turn(Robot robot, boolean left) {
         if (left) {
             robot.spin(Actions.Q);
         } else {
             robot.spin(Actions.E);
         }
-        removePointsToVisit();
+        removePointsToVisit(robot);
+    }
+
+    public int getNumRobots() {
+        return robots.size();
+    }
+
+    public Robot getRobot(int index) {
+        return robots.get(index);
     }
 }

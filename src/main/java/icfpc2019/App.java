@@ -10,10 +10,11 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class App {
+
+    private static final boolean PARALLEL = true;
 
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {
@@ -23,9 +24,19 @@ public class App {
 
         if (args[0].equals("--target-dir")) {
             String targetDir = args[1];
-            Arrays.stream(args, 2, args.length)
-                    .parallel()
-                    .forEach(p -> safeSolveProblem(p, targetFile(p, targetDir)));
+            if (PARALLEL) {
+                Arrays.stream(args, 2, args.length)
+                        .parallel()
+                        .forEach(p -> safeSolveProblem(p, targetFile(p, targetDir)));
+            } else {
+                SortedSet<String> problems = new TreeSet<>();
+                for (int i = 2; i < args.length; i++) {
+                    problems.add(args[i]);
+                }
+                for (String p : problems) {
+                    safeSolveProblem(p, targetFile(p, targetDir));
+                }
+            }
         } else if (args.length > 1) {
             solveProblem(args[0], args[1]);
         } else {
@@ -59,6 +70,9 @@ public class App {
                 Point next = state.getNextPointToVisit(r);
                 if (next == null) continue;
                 List<StarNode> starPath = finder.findPath(state.getCurrentPosition(r), next, 10);
+                if (starPath.isEmpty()) {
+                    System.out.format("Empty path for robot %d/%d at %s\n", i, numRobots, r.position);
+                }
                 state.move(r, starPath);
             }
         }

@@ -10,7 +10,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 public class App {
@@ -48,7 +47,12 @@ public class App {
                 Point next = state.getNextPointToVisit(r);
                 if (next == null) continue;
                 List<StarNode> starPath = finder.findPath(state.getCurrentPosition(r), next, 10);
-                state.move(r, starPath);
+                if (numRobots > 1) {
+                    //only one field at a time when there are multiple robots, to keep them in sync
+                    state.move(r, starPath.get(0), true);
+                } else {
+                    state.move(r, starPath);
+                }
             }
         }
         System.out.println("Solution length: " + combineResults(state).length());
@@ -73,14 +77,6 @@ public class App {
         BufferedWriter writer = new BufferedWriter(new FileWriter(path));
         writer.write(content);
         writer.close();
-    }
-
-    private static List<Point> pathFromStarNodes(List<StarNode> starPath) {
-        List<Point> path = new ArrayList<>();
-        for (StarNode star : starPath) {
-            path.add(Point.of(star.getXPosition(), star.getYPosition()));
-        }
-        return path;
     }
 
     private static String readFile(String path, Charset encoding) throws IOException {

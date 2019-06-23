@@ -1,7 +1,12 @@
 package icfpc2019;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+
+import javafx.util.*;
 
 import icfpc2019.pathfinder.Pathfinder;
 import icfpc2019.pathfinder.StarNode;
@@ -102,6 +107,8 @@ public class State {
         if (complexMode) return finder.findPath(best, current, 0).size();
         return Math.abs(best.getX() - current.getX()) + Math.abs(best.getY() - current.getY());
     }
+
+
     int moved = 0;
     public void move(Robot robot, List<StarNode> path, int maxMoves) {
         StarNode last = path.get(path.size() - 1);        
@@ -114,7 +121,7 @@ public class State {
             if(moved==maxMoves)         
                 break;
             Point p = last.getAsPoint();
-            if (!lastPointOpen(p) && !lastPointRelevant(p)) break;
+            if (!lastPointOpen(p) && !lastPointRelevant(p)) break;            
             move(robot, point);
             moved +=1;
         }

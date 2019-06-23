@@ -73,7 +73,7 @@ public class App {
                 if (starPath.isEmpty()) {
                     System.out.format("Empty path for robot %d/%d at %s\n", i, numRobots, r.position);
                 }
-                state.move(r, starPath);
+                state.move(r, starPath, 10);
             }
         }
         String result = combineResults(state);

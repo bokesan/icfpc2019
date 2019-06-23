@@ -29,13 +29,22 @@ public class CounterClockwiseSolver implements Solver {
         robots.add(robot);
         markFieldsWrapped(robot);
     }
+    @Override
+    public void init(ProblemDesc problem, String shoppinglist){
+        grid = Grid.of(problem);
+        finder = new Pathfinder();
+        finder.initNodes(grid);
+        state = new State(grid, problem.getBoosters(), shoppinglist);
+        Robot robot = new Robot(problem.getInitialWorkerLocation());
+        robots.add(robot);
+        markFieldsWrapped(robot);        
+    }
 
     @Override
     public String solve() {
         if (DISTRIBUTE_EXTENSIONS_EVENLY) {
-            //TODO: count available booster from purchases
-            int numExtensions = state.getBoosterLocations(BoosterCode.B).size();
-            double numRobots = 1 + state.getBoosterLocations(BoosterCode.C).size();
+            int numExtensions = state.getBoosterLocations(BoosterCode.B).size() + state.getNumAvailableBooster(BoosterCode.B);
+            double numRobots = 1 + state.getBoosterLocations(BoosterCode.C).size() + state.getNumAvailableBooster(BoosterCode.C);
             extensionsPerBot = (int) Math.ceil(numExtensions / numRobots);
         }
 

@@ -11,7 +11,7 @@ import java.util.*;
 
 public class App {
 
-    private static final boolean PARALLEL = false;
+    private static final boolean PARALLEL = true;
 
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {

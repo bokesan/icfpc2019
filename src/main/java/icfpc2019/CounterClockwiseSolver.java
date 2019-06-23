@@ -64,7 +64,7 @@ public class CounterClockwiseSolver implements Solver {
 
     private void discoverAction(Robot robot) {
         //install a teleport if available
-        if (state.boosterAvailable(BoosterCode.R) && USE_TELEPORT) {
+        if (state.boosterAvailable(BoosterCode.R) && USE_TELEPORT && !state.getBoosterLocations(BoosterCode.X).contains(robot.position)) {
             scheduleAction(R, robot);
             return;
         }

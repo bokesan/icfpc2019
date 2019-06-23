@@ -1,4 +1,4 @@
-module Puzzle where
+module Puzzle (Puzzle(..), parsePuzzle) where
 
 import Text.Parsec
 
@@ -19,8 +19,9 @@ data Puzzle = Puzzle { bNum :: !Int -- block number
                      , oSqs :: [Point]
                      } deriving Show
 
-puzzle :: Parsec String st Puzzle
-puzzle = do bN <- nat
+parsePuzzle :: Parsec String st Puzzle
+parsePuzzle = do
+            bN <- nat
             char ','
             eN <- nat
             char ','

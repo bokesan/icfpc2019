@@ -29,7 +29,7 @@ public class CounterClockwiseSolver implements Solver {
     @Override
     public String solve() {
         while (!state.mapFinished()) {
-            for (Robot robot : robots) {
+            for (Robot robot : new ArrayList<>(robots)) {
                 if (!robot.knowsWhatToDo()) {
                     //the robot needs advise - figure out what to do
                     discoverAction(robot);

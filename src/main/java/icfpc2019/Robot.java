@@ -12,6 +12,7 @@ public class Robot {
     private StringBuilder log = new StringBuilder();
     private int fastWheelUnits = 0;
     private int drillUnits = 0;
+    private List<Action> toDoList = new ArrayList<>();
 
     public Robot(Point position) {
         this.position = position;
@@ -93,7 +94,7 @@ public class Robot {
         countTimeUnit();
     }
 
-    public void turn(Action action) {
+    void turn(Action action) {
         switch (action) {
             case Q: turnLeft(); break;
             case E: turnLeft(); turnLeft(); turnLeft(); break;
@@ -103,11 +104,23 @@ public class Robot {
         countTimeUnit();
     }
 
-    public void attachManipulator(Point p) {
+    void attachManipulator(Point p) {
         //todo check validity etc
         manipulators.add(p);
         log.append(Action.B.toString()).append(p.translate(Point.of(-position.getX(), -position.getY())).toString());
         countTimeUnit();
+    }
+
+    boolean knowsWhatToDo() {
+        return !toDoList.isEmpty();
+    }
+
+    Action getWhatToDo() {
+        return toDoList.remove(0);
+    }
+
+    public void tellWhatTodDo(Action action) {
+        toDoList.add(action);
     }
 
     public static class ExtensionException extends RuntimeException {

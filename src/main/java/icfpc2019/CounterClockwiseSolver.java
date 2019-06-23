@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static icfpc2019.Action.*;
-import static icfpc2019.Direction.SOUTH;
 
 public class CounterClockwiseSolver implements Solver {
 
@@ -29,45 +28,53 @@ public class CounterClockwiseSolver implements Solver {
 
     @Override
     public String solve() {
-        Robot robot = robots.get(0);
-
+        Robot initBot = robots.get(0);
         //collect all manipulators and attach to the right
-        setupManipulators(robot);
+        setupManipulators(initBot);
 
         //todo do cloning?
         //todo set up teleports?
 
         while (!state.mapFinished()) {
-            //find an empty field next to a wall or wrapped field
-            //orient "backwards" with manipulators trailing and pointing away from wall
-            setupStartLocation(robot);
-            //System.out.println("Set Up Position");
+            for (Robot robot : robots) {
+                //if the robot knows what to do, let him
+                if (robot.knowsWhatToDo()) {
+                    performAction(robot);
+                    continue;
+                }
+                //the robot needs advise - figure out what to do
 
-            //fill that connected area
-            //if all adjacent fields are filled, break
-            while (hasFreeNeighbours(robot)) {
-                //if there is no wall/wrap to my right, turn right and move forward
-                Point right = getMyRight(robot);
-                if (state.needsWrapping(right)) {
-                    //System.out.println("Turning right");
-                    if (state.needsWrapping(getDoubleRight(robot))) {
-                        performAction(E, robot);
+                //find an empty field next to a wall or wrapped field
+                //orient "backwards" with manipulators trailing and pointing away from wall
+                setupStartLocation(robot);
+                //System.out.println("Set Up Position");
+
+                //fill that connected area
+                //if all adjacent fields are filled, break
+                while (hasFreeNeighbours(robot)) {
+                    //if there is no wall/wrap to my right, turn right and move forward
+                    Point right = getMyRight(robot);
+                    if (state.needsWrapping(right)) {
+                        //System.out.println("Turning right");
+                        if (state.needsWrapping(getDoubleRight(robot))) {
+                            scheduleAction(E, robot);
+                        }
+                        move(robot, robot.position, right);
+                        continue;
                     }
-                    move(robot, right);
-                    continue;
-                }
 
-                //if there is a need for wrap ahead, move on
-                Point front = getMyFront(robot);
-                if (state.needsWrapping(front)) {
-                    //System.out.println("Moving forward");
-                    move(robot, front);
-                    continue;
-                }
+                    //if there is a need for wrap ahead, move on
+                    Point front = getMyFront(robot);
+                    if (state.needsWrapping(front)) {
+                        //System.out.println("Moving forward");
+                        move(robot, robot.position, front);
+                        continue;
+                    }
 
-                //otherwise, turn left
-                performAction(Q, robot);
-                //System.out.println("Turning left");
+                    //otherwise, turn left
+                    scheduleAction(Q, robot);
+                    //System.out.println("Turning left");
+                }
             }
         }
         return combineResults();
@@ -89,7 +96,7 @@ public class CounterClockwiseSolver implements Solver {
         while (!manipulatorBoosters.isEmpty()) {
             Point next = getNearestPoint(manipulatorBoosters, robot.position);
             moveUntilThere(robot, next);
-            performAction(B, robot);
+            scheduleAction(B, robot);
             manipulatorBoosters = state.getBoosterLocations(BoosterCode.B);
         }
     }
@@ -168,8 +175,9 @@ public class CounterClockwiseSolver implements Solver {
     private void moveUntilFree(Robot robot, List<Point> path) {
         int maxLength = 20 + cutPathCounter;
         int steps = 0;
+        Point from = robot.position;
         for (Point p : path) {
-            move(robot, p);
+            from = move(robot, from, p);
             steps++;
             //as soon as we find an area to fill, we go for it
             if (hasFreeNeighbours(robot)) {
@@ -185,24 +193,31 @@ public class CounterClockwiseSolver implements Solver {
 
     private void moveUntilThere(Robot robot, Point target) {
         List<Point> path = finder.getPath(robot.position, target);
+        Point from = robot.position;
         for (Point p : path) {
-            move(robot, p);
+            from = move(robot, from, p);
         }
     }
 
-    private void move(Robot robot, Point target) {
-        Direction direction = Direction.of(robot.position, target);
-        if (direction == null) throw new RuntimeException("Invalid move: " + robot.position + " to " + target);
+    private Point move(Robot robot, Point from, Point target) {
+        Direction direction = Direction.of(from, target);
+        if (direction == null) throw new RuntimeException("Invalid move: " + from + " to " + target);
         switch (direction) {
-            case EAST:  performAction(D, robot); break;
-            case WEST:  performAction(A, robot); break;
-            case NORTH: performAction(W, robot); break;
-            case SOUTH: performAction(S, robot); break;
+            case EAST:  scheduleAction(D, robot); break;
+            case WEST:  scheduleAction(A, robot); break;
+            case NORTH: scheduleAction(W, robot); break;
+            case SOUTH: scheduleAction(S, robot); break;
             default: throw new RuntimeException("Invalid direction: " + direction.name());
         }
+        return target;
     }
 
-    private void performAction(Action action, Robot robot) {
+    private void scheduleAction(Action action, Robot robot) {
+        robot.tellWhatTodDo(action);
+    }
+
+    private void performAction(Robot robot) {
+        Action action = robot.getWhatToDo();
         switch (action) {
             case W: //FALLTHROUGH
             case A: //FALLTHROUGH

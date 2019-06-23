@@ -28,10 +28,6 @@ public class CounterClockwiseSolver implements Solver {
 
     @Override
     public String solve() {
-
-        //todo do cloning?
-        //todo set up teleports?
-
         while (!state.mapFinished()) {
             for (Robot robot : robots) {
                 if (!robot.knowsWhatToDo()) {
@@ -74,8 +70,7 @@ public class CounterClockwiseSolver implements Solver {
             scheduleAction(Q, robot);
             return;
         }
-        //find an empty field next to a wall or wrapped field
-        //orient "backwards" with manipulators trailing and pointing away from wall
+        //find an empty field
         setupStartLocation(robot);
     }
 

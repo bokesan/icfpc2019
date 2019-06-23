@@ -9,22 +9,6 @@ import Puzzle
 import PuzzleSolver
 import Task
 
-
-samplePuzzle = Puzzle { bNum = 1, eNum = 2,
-                        tSize = 8,
-                        vMin = 0, vMax = 0,
-                        mNum = 0, fNum = 0, dNum = 0,
-                        rNum = 0, cNum = 0, xNum = 0,
-                        iSqs = [Point 4 4],
-                        oSqs = [Point 4 3] }
-
-samplePuzzle2 = Puzzle { bNum = 1, eNum = 2,
-                         tSize = 20,
-                         vMin = 20, vMax = 100,
-                         mNum = 0, fNum = 1, dNum = 0,
-                         rNum = 0, cNum = 0, xNum = 0,
-                         iSqs = [Point 4 4, Point 10 13],
-                         oSqs = [Point 4 3, Point 8 13] }
                         
 
 main :: IO ()

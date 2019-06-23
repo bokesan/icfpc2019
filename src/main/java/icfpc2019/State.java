@@ -20,20 +20,18 @@ class State {
         this(grid, boosters);
         availableBoosters.addAll(checkoutShoppinglist(shoppingList));
     }
-    
+
     private List<BoosterCode> checkoutShoppinglist(String shoppingList){
-        char[] items = shoppingList.toCharArray();
         List<BoosterCode> boughtItems = new ArrayList<>();
-        for(char item : items){            
-            try{                
+        for(char item : shoppingList.toCharArray()) {
+            try {
                 boughtItems.add(BoosterCode.valueOf(String.valueOf(item)));
-            }catch(IllegalArgumentException illegalArgument){
-                //not contained
+            } catch(IllegalArgumentException illegalArgument){
+                throw new RuntimeException("Invalid booster code: " + item);
             }
-        }        
+        }
         return boughtItems;
     }
-    
 
     boolean mapFinished() {
         return toVisit.isEmpty();
@@ -98,5 +96,13 @@ class State {
 
     boolean isTeleportTarget(Point target) {
         return telePortTargets.contains(target);
+    }
+
+    int getNumAvailableBooster(BoosterCode code) {
+        int i = 0;
+        for (BoosterCode b : availableBoosters) {
+            if (code == b) i++;
+        }
+        return i;
     }
 }

@@ -1,5 +1,6 @@
 package icfpc2019;
 
+import java.io.File;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -83,9 +84,9 @@ public class App {
         if (path.endsWith(".desc")) {
             path = path.substring(0, path.length() - 4) + "sol";
         }
-        int p = path.lastIndexOf('/');
+        int p = path.lastIndexOf(File.separatorChar);
         if (p < 0) {
-            return dir + "/" + path;
+            return dir + File.separator + path;
         } else {
             return dir + path.substring(p);
         }

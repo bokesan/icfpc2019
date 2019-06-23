@@ -82,7 +82,7 @@ public class Robot {
     }
 
     void singleStep(Action action) {
-        switch (action) {
+        switch (action.type) {
             case W: position = position.up();       moveManipulators(0, 1);     break;
             case A: position = position.left();     moveManipulators(-1, 0);    break;
             case S: position = position.down();     moveManipulators(0, -1);    break;
@@ -93,10 +93,10 @@ public class Robot {
     }
 
     void turn(Action action) {
-        switch (action) {
+        switch (action.type) {
             case Q: turnLeft(); break;
             case E: turnLeft(); turnLeft(); turnLeft(); break;
-            default: throw new RuntimeException("Invalid turning direction: " + action.name());
+            default: throw new RuntimeException("Invalid turning direction: " + action.toString());
         }
         log.append(action.toString());
         countTimeUnit();
@@ -121,10 +121,25 @@ public class Robot {
         toDoList.add(action);
     }
 
-    public Robot cloneBot() {
+    Robot cloneBot() {
         Robot newBot = new Robot(position);
         log.append(Action.C.toString());
+        countTimeUnit();
         return newBot;
+    }
+
+    void addTeleporter() {
+        log.append(Action.R.toString());
+        countTimeUnit();
+    }
+
+    public void teleport(Action action) {
+        int divX = action.point.getX() - position.getX();
+        int divy = action.point.getY() - position.getY();
+        position = action.point;
+        moveManipulators(divX, divy);
+        log.append(action.toString());
+        countTimeUnit();
     }
 
     public static class ExtensionException extends RuntimeException {

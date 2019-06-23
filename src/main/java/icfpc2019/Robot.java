@@ -43,10 +43,8 @@ public class Robot {
     }
 
     private void countTimeUnit(){
-        if(drillUnits > 0)
-            drillUnits -= 1;
-        if(fastWheelUnits > 0)
-            fastWheelUnits -= 1;
+        if(drillUnits > 0) drillUnits--;
+        if(fastWheelUnits > 0) fastWheelUnits--;
     }
 
     private void turnLeft(){
@@ -119,19 +117,19 @@ public class Robot {
         return toDoList.remove(0);
     }
 
-    public void tellWhatTodDo(Action action) {
+    void tellWhatToDo(Action action) {
         toDoList.add(action);
+    }
+
+    public Robot cloneBot() {
+        Robot newBot = new Robot(position);
+        log.append(Action.C.toString());
+        return newBot;
     }
 
     public static class ExtensionException extends RuntimeException {
         ExtensionException(String msg){
             super(msg);
-        }
-    }
-
-    public static class InvalidMoveException extends RuntimeException {
-        InvalidMoveException(Point position, Point newPosition) {
-            super("invalid move attempted from " + position + " to " + newPosition);
         }
     }
 }

@@ -233,7 +233,7 @@ public class CounterClockwiseSolver implements Solver {
     }
 
     private void scheduleAction(Action action, Robot robot) {
-        robot.tellWhatTodDo(action);
+        robot.tellWhatToDo(action);
     }
 
     private void performAction(Robot robot) {
@@ -255,17 +255,12 @@ public class CounterClockwiseSolver implements Solver {
                     markFieldsWrapped(robot);
                     break;
             case C: state.removeBooster(BoosterCode.C);
-                    Robot newBot = cloneRobot(robot);
+                    Robot newBot = robot.cloneBot();
+                    robots.add(newBot);
                     markFieldsWrapped(newBot);
                     break;
             default: throw new RuntimeException("Action not implemented: " + action.name());
         }
-    }
-
-    private Robot cloneRobot(Robot robot) {
-        Robot newBot = new Robot(robot.position);
-        robots.add(newBot);
-        return newBot;
     }
 
     private void attachManipulator(Robot robot) {

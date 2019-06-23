@@ -34,8 +34,8 @@ public class CounterClockwiseSolver implements Solver {
                     //the robot needs advise - figure out what to do
                     discoverAction(robot);
                 }
-                //if the robot knows what to do, let him
-                performAction(robot);
+                //if the robot knows what to do, let him (if he doesnt, we are actually done
+                if (robot.knowsWhatToDo()) performAction(robot);
             }
         }
         return combineResults();
@@ -168,6 +168,10 @@ public class CounterClockwiseSolver implements Solver {
     private void setupStartLocation(Robot robot) {
         //find the nearest empty field
         List<Point> targets = state.getUnwrappedPoints();
+        if (targets.isEmpty()) {
+            //we are done, yay!
+            return;
+        }
         Point best = targets.get(0);
         int bestDistance = getManhattanDistance(robot.position, best);
 

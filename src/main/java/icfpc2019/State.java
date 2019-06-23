@@ -3,25 +3,16 @@ package icfpc2019;
 import java.util.ArrayList;
 import java.util.List;
 
-import static icfpc2019.BoosterCode.*;
-
 class State {
 
     private List<BoosterLocation> gridBoosters;
-    private List<BoosterCode> availableBoosters;
-    private Grid grid;
+    private List<BoosterCode> availableBoosters = new ArrayList<>();
+    private List<BoosterCode> tooHotBoosters = new ArrayList<>();
     private List<Point> toVisit; // FIXME: Performance: can we use a faster data structure for this?
 
     State(Grid grid, List<BoosterLocation> boosters) {
-        this.grid = grid;
         this.gridBoosters = boosters;
-        this.availableBoosters = new ArrayList<>();
-        this.toVisit = new ArrayList<>();
         this.toVisit = grid.getFreeSquares();
-    }
-
-    public void markFieldsWrapped(List<Point> points) {
-        toVisit.removeAll(points);
     }
 
     boolean mapFinished() {
@@ -39,7 +30,7 @@ class State {
     void pickBoosterUp(Point position) {
         for (BoosterLocation booster : gridBoosters) {
             if (booster.getBoosterCode() != BoosterCode.X && booster.getPoint().equals(position)) {
-                availableBoosters.add(booster.getBoosterCode());
+                tooHotBoosters.add(booster.getBoosterCode());
                 gridBoosters.remove(booster);
                 break;
             }
@@ -69,8 +60,13 @@ class State {
         return result;
     }
 
-    public void removeBooster(BoosterCode b) {
+    void removeBooster(BoosterCode b) {
         if (!availableBoosters.contains(b)) throw new RuntimeException("Booster not available: " + b.name());
         availableBoosters.remove(b);
+    }
+
+    void coolBoosterDown() {
+        availableBoosters.addAll(tooHotBoosters);
+        tooHotBoosters.clear();
     }
 }

@@ -29,13 +29,14 @@ public class CounterClockwiseSolver implements Solver {
     @Override
     public String solve() {
         while (!state.mapFinished()) {
+            state.coolBoosterDown();
             for (Robot robot : new ArrayList<>(robots)) {
                 if (!robot.knowsWhatToDo()) {
                     //the robot needs advise - figure out what to do
                     discoverAction(robot);
                 }
-                //if the robot knows what to do, let him (if he doesnt, we are actually done
-                if (robot.knowsWhatToDo()) performAction(robot);
+                //if the robot knows what to do, let him (if he doesnt, we are actually done)
+                if (robot.knowsWhatToDo()) performAction(robot); //todo let him wait otherwise to stay synced
             }
         }
         return combineResults();

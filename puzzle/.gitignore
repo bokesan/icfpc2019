@@ -1,3 +1,5 @@
 .stack-work/
 icfp2019.cabal
+task_*.desc
+*.prof
 *~

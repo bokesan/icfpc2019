@@ -42,9 +42,33 @@ public class CounterClockwiseSolver implements Solver {
     }
 
     private void discoverAction(Robot robot) {
-        //collect all manipulators and attach to the right
+        //attach manipulator
+        if (state.boosterAvailable(BoosterCode.B)) {
+            scheduleAction(B, robot);
+            return;
+        }
+
+        //collect clone
+        if (state.mapHasBooster(BoosterCode.C)) {
+            collectBooster(robot, BoosterCode.C);
+            return;
+        }
+
+        //use clone booster
+        if (state.boosterAvailable(BoosterCode.C) && state.getBoosterLocations(BoosterCode.X).contains(robot.position)) {
+            scheduleAction(C, robot);
+            return;
+        }
+
+        //got to mystery platform
+        if (state.boosterAvailable(BoosterCode.C) && state.mapHasBooster(BoosterCode.X)) {
+            collectBooster(robot, BoosterCode.X);
+            return;
+        }
+
+        //collect manipulator
         if (state.mapHasBooster(BoosterCode.B)) {
-            setupManipulators(robot);
+            collectBooster(robot, BoosterCode.B);
             return;
         }
 
@@ -85,12 +109,11 @@ public class CounterClockwiseSolver implements Solver {
         }
     }
 
-    private void setupManipulators(Robot robot) {
-        List<Point> manipulatorBoosters = state.getBoosterLocations(BoosterCode.B);
+    private void collectBooster(Robot robot, BoosterCode booster) {
+        List<Point> manipulatorBoosters = state.getBoosterLocations(booster);
         if (!manipulatorBoosters.isEmpty()) {
             Point next = getNearestPoint(manipulatorBoosters, robot.position);
             moveUntilThere(robot, next);
-            scheduleAction(B, robot);
         }
     }
 
@@ -216,19 +239,29 @@ public class CounterClockwiseSolver implements Solver {
             case A: //FALLTHROUGH
             case S: //FALLTHROUGH
             case D: robot.singleStep(action); //fixme: this entire stuff might happen twice if the robot has fast wheels
-                markFieldsWrapped(robot);
-                state.pickBoosterUp(robot.position);
-                break;
+                    markFieldsWrapped(robot);
+                    state.pickBoosterUp(robot.position);
+                    break;
             case Q: //FALLTHROUGH
             case E: robot.turn(action);
-                markFieldsWrapped(robot);
-                break;
+                    markFieldsWrapped(robot);
+                    break;
             case B: state.removeBooster(BoosterCode.B);
-                attachManipulator(robot);
-                markFieldsWrapped(robot);
-                break;
+                    attachManipulator(robot);
+                    markFieldsWrapped(robot);
+                    break;
+            case C: state.removeBooster(BoosterCode.C);
+                    Robot newBot = cloneRobot(robot);
+                    markFieldsWrapped(newBot);
+                    break;
             default: throw new RuntimeException("Action not implemented: " + action.name());
         }
+    }
+
+    private Robot cloneRobot(Robot robot) {
+        Robot newBot = new Robot(robot.position);
+        robots.add(newBot);
+        return newBot;
     }
 
     private void attachManipulator(Robot robot) {

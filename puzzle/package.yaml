@@ -22,6 +22,7 @@ dependencies:
 - base >= 4.7 && < 5
 - parsec
 - random
+- containers
 
 library:
   source-dirs: src
@@ -32,6 +33,7 @@ executables:
     source-dirs:         app
     ghc-options:
     - -Wall
+    - -rtsopts
     dependencies:
     - icfp2019
 
@@ -41,5 +43,6 @@ tests:
     source-dirs:         test
     ghc-options:
     - -Wall
+    - -rtsopts
     dependencies:
     - icfp2019

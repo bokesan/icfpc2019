@@ -7,6 +7,7 @@ import System.Random
 import Types
 import Puzzle
 import Task
+import Grid
 
 solvePuzzle :: Puzzle -> Maybe (Task, Grid)
 solvePuzzle puzzle = fmap (fillTask puzzle) $ go start (oSqs puzzle)
@@ -63,34 +64,15 @@ complicate puzzle grid = go rng grid
                              (g':_) -> go rng'' g'
     
 
-data Grid = Grid [Point] -- solid squares
-
-instance Show Grid where
-  showsPrec _ grd = let (maxX,maxY) = maxBounds grd
-                        showSquare x y | isWall grd (Point x y) = '#'
-                                       | otherwise = '.'
-                        showRow y = [showSquare x y | x <- [0 .. maxX]]
-                        showGrid h | h < 0 = id
-                                   | otherwise = showString (showRow h) . showChar '\n'
-                                                 . showGrid (h - 1)
-                    in showGrid maxY
-
-isWall, isFree :: Grid -> Point -> Bool
-isWall (Grid walls) p = p `elem` walls
-isFree g = not . isWall g
-
-addWall :: Grid -> Point -> Grid
-addWall (Grid walls) p = Grid (p : walls)
-
 border :: Int -> Grid
-border n = Grid ([Point 0  i | i <- [0 .. n']] ++
-                 [Point n' i | i <- [0 .. n']] ++
-                 [Point i  0 | i <- [0 .. n']] ++
-                 [Point i n' | i <- [0 .. n']])
+border n = fromWalls ([Point 0  i | i <- [0 .. n']] ++
+                      [Point n' i | i <- [0 .. n']] ++
+                      [Point i  0 | i <- [0 .. n']] ++
+                      [Point i n' | i <- [0 .. n']])
   where n' = n - 1
 
 nearestTo :: Grid -> Point -> Point
-nearestTo (Grid grid) point = snd (minimum [(manhattanDistance p point, p) | p <- grid])
+nearestTo grid point = snd (minimum [(manhattanDistance p point, p) | p <- allWalls grid])
 
 -- grow puzzle grid src dest
 --  grow walls from existing wall src to and including dest
@@ -100,10 +82,6 @@ grow puzzle grid src dest
   | otherwise   = let ns = [p | p <- neighbors src, not (isWall grid p), p `notElem` iSqs puzzle]
                       ans = map snd (sort [(manhattanDistance p dest, p) | p <- ns])
                   in concat [grow puzzle (addWall grid p) p dest | p <- ans]
-
-maxBounds :: Grid -> (Int, Int)
-maxBounds (Grid walls) = (maximum [x | Point x _ <- walls],
-                          maximum [y | Point _ y <- walls])
 
 allOpen :: Grid -> [Point]
 allOpen grid = [Point x y | x <- [0 .. maxX], y <- [0 .. maxY], isFree grid (Point x y)]

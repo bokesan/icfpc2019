@@ -4,6 +4,7 @@ import icfpc2019.pathfinder.Pathfinder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static icfpc2019.Action.*;
 
@@ -41,7 +42,7 @@ public class CounterClockwiseSolver implements Solver {
     }
 
     @Override
-    public String solve() {
+    public List<ActionSequence> solve() {
         if (DISTRIBUTE_EXTENSIONS_EVENLY) {
             int numExtensions = state.getBoosterLocations(BoosterCode.B).size() + state.getNumAvailableBooster(BoosterCode.B);
             double numRobots = 1 + state.getBoosterLocations(BoosterCode.C).size() + state.getNumAvailableBooster(BoosterCode.C);
@@ -334,13 +335,7 @@ public class CounterClockwiseSolver implements Solver {
         }
     }
 
-    private String combineResults() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(robots.get(0).getActionLog());
-        for (int i = 1; i < robots.size(); i++) {
-            builder.append("#");
-            builder.append(robots.get(i).getActionLog());
-        }
-        return builder.toString();
+    private List<ActionSequence> combineResults() {
+        return robots.stream().map(Robot::getActionLog).collect(Collectors.toList());
     }
 }

@@ -9,7 +9,7 @@ public class Robot {
     Point position;
     Direction direction;
     private List<Point> manipulators;
-    private StringBuilder log = new StringBuilder();
+    private final ActionSequence log = new ActionSequence();
     private int fastWheelUnits = 0;
     private int drillUnits = 0;
     private List<Action> toDoList = new ArrayList<>();
@@ -73,8 +73,8 @@ public class Robot {
         manipulators = tempList;
     }
 
-    String getActionLog() {
-        return log.toString();
+    ActionSequence getActionLog() {
+        return log;
     }
 
     public List<Point> getManipulators() {
@@ -88,7 +88,7 @@ public class Robot {
             case S: position = position.down();     moveManipulators(0, -1);    break;
             case D: position = position.right();    moveManipulators(1, 0);     break;
         }
-        log.append(action.toString());
+        log.append(action);
         countTimeUnit();
     }
 
@@ -98,14 +98,14 @@ public class Robot {
             case E: turnLeft(); turnLeft(); turnLeft(); break;
             default: throw new RuntimeException("Invalid turning direction: " + action.toString());
         }
-        log.append(action.toString());
+        log.append(action);
         countTimeUnit();
     }
 
     void attachManipulator(Point p) {
         //todo check validity etc
         manipulators.add(p);
-        log.append(Action.B.toString()).append(p.translate(Point.of(-position.getX(), -position.getY())).toString());
+        log.append(ActionType.B, p.translate(Point.of(-position.getX(), -position.getY())));
         countTimeUnit();
     }
 
@@ -123,13 +123,13 @@ public class Robot {
 
     Robot cloneBot() {
         Robot newBot = new Robot(position);
-        log.append(Action.C.toString());
+        log.append(Action.C);
         countTimeUnit();
         return newBot;
     }
 
     void addTeleporter() {
-        log.append(Action.R.toString());
+        log.append(Action.R);
         countTimeUnit();
     }
 
@@ -138,7 +138,7 @@ public class Robot {
         int divy = action.point.getY() - position.getY();
         position = action.point;
         moveManipulators(divX, divy);
-        log.append(action.toString());
+        log.append(action);
         countTimeUnit();
     }
 
@@ -148,4 +148,3 @@ public class Robot {
         }
     }
 }
-

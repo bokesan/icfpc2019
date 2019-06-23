@@ -2,13 +2,13 @@ package icfpc2019;
 
 import java.io.File;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class App {
 
@@ -61,8 +61,9 @@ public class App {
             solver.init(problem, shoppingList);
         else
             solver.init(problem);
-        String result = solver.solve();
-        writeResult(solutionFile, startTime, result);
+        List<ActionSequence> result = solver.solve();
+        String actions = result.stream().map(ActionSequence::getEncoding).collect(Collectors.joining("#"));
+        writeResult(solutionFile, startTime, actions, result.get(0).getLength());
     }
 
     private static String getShoppinglist(String path) throws IOException{
@@ -72,14 +73,14 @@ public class App {
         }        
         return shoppingList;
     }
-    private static void writeResult(String solutionFile, long startTime, String result) throws IOException {
+    private static void writeResult(String solutionFile, long startTime, String result, int score) throws IOException {
         if (solutionFile == null) {
-            System.out.format("Solution length: %d\n", result.length());
+            System.out.format("Solution length: %d, score: %d\n", result.length(), score);
         } else {
             writeFile(solutionFile, result);
             long elapsed = System.nanoTime() - startTime;
-            System.out.format("Solution written to %s, length: %d, elapsed: %.3fs\n",
-                    solutionFile, result.length(), elapsed / 1.0e9);
+            System.out.format("Solution written to %s, length: %d, score: %d, elapsed: %.3fs\n",
+                    solutionFile, result.length(), score, elapsed / 1.0e9);
         }
     }
 

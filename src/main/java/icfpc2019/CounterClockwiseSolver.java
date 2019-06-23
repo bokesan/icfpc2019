@@ -9,11 +9,14 @@ import static icfpc2019.Action.*;
 
 public class CounterClockwiseSolver implements Solver {
 
+    private static final boolean DISTRIBUTE_EXTENSIONS_EVENLY = true;
+
     private Pathfinder finder;
     private Grid grid;
     private State state;
     private List<Robot> robots = new ArrayList<>();
     private int cutPathCounter = 0;
+    private int extensionsPerBot = Integer.MAX_VALUE;
 
     @Override
     public void init(ProblemDesc problem) {
@@ -28,6 +31,13 @@ public class CounterClockwiseSolver implements Solver {
 
     @Override
     public String solve() {
+        if (DISTRIBUTE_EXTENSIONS_EVENLY) {
+            //TODO: count available booster from purchases
+            int numExtensions = state.getBoosterLocations(BoosterCode.B).size();
+            double numRobots = 1 + state.getBoosterLocations(BoosterCode.C).size();
+            extensionsPerBot = (int) Math.ceil(numExtensions / numRobots);
+        }
+
         while (!state.mapFinished()) {
             state.coolBoosterDown();
             for (Robot robot : new ArrayList<>(robots)) {
@@ -43,8 +53,8 @@ public class CounterClockwiseSolver implements Solver {
     }
 
     private void discoverAction(Robot robot) {
-        //attach manipulator
-        if (state.boosterAvailable(BoosterCode.B)) {
+        //attach manipulator if we have less than the maximum (discount four for the body and starting manipulators)
+        if (state.boosterAvailable(BoosterCode.B) && robot.getManipulators().size() - 4 < extensionsPerBot) {
             scheduleAction(B, robot);
             return;
         }

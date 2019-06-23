@@ -75,11 +75,11 @@ public class App {
     }
     private static void writeResult(String solutionFile, long startTime, String result, int score) throws IOException {
         if (solutionFile == null) {
-            System.out.format("Solution length: %d, score: %d\n", result.length(), score);
+            System.out.format("Solution length: %d, actions: %d\n", result.length(), score);
         } else {
             writeFile(solutionFile, result);
             long elapsed = System.nanoTime() - startTime;
-            System.out.format("Solution written to %s, length: %d, score: %d, elapsed: %.3fs\n",
+            System.out.format("Solution written to %s, length: %d, actions: %d, elapsed: %.3fs\n",
                     solutionFile, result.length(), score, elapsed / 1.0e9);
         }
     }

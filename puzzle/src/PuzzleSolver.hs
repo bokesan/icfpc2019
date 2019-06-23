@@ -79,9 +79,10 @@ nearestTo grid point = snd (minimum [(distanceSquared p point, p) | p <- allWall
 grow :: Puzzle -> Grid -> Point -> Point -> [Grid]
 grow puzzle grid src dest
   | src == dest = [grid]
-  | otherwise   = let ns = [p | p <- neighbors src, not (isWall grid p), p `notElem` iSqs puzzle]
-                      ans = map snd (sort [(distanceSquared p dest, p) | p <- ns])
+  | otherwise   = let ns = [p | p <- neighbors src, isFree grid p, p `notElem` iSqs puzzle]
+                      ans = map snd (sort [(manhattanDistance p dest, p) | p <- ns])
                   in concat [grow puzzle (addWall grid p) p dest | p <- ans]
+
 
 allOpen :: Grid -> [Point]
 allOpen grid = [Point x y | x <- [0 .. maxX], y <- [0 .. maxY], isFree grid (Point x y)]

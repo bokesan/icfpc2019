@@ -1,5 +1,6 @@
 package icfpc2019;
 
+import java.io.File;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -100,7 +101,7 @@ public class App {
         if (path.endsWith(".desc")) {
             path = path.substring(0, path.length() - 4) + "sol";
         }
-        int p = path.lastIndexOf(File.separatorChar);
+        int p = path.lastIndexOf(File.separatorChar);      
         if (p < 0) {
             return dir + File.separatorChar + path;
         } else {

@@ -4,7 +4,6 @@ import System.IO
 import System.Environment (getArgs)
 import Text.Parsec
 
-import Types
 import Puzzle
 import PuzzleSolver
 import Task
@@ -15,7 +14,7 @@ main :: IO ()
 main =  do [specFile] <- getArgs
            handle <- openFile specFile ReadMode  
            spec <- hGetContents handle  
-           case parse puzzle "" spec of
+           case parse parsePuzzle "" spec of
              Left err -> print err
              Right puzzle -> solve puzzle
            hClose handle

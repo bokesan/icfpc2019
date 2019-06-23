@@ -10,6 +10,7 @@ class State {
     private List<BoosterCode> mildlyWarmBoosters = new ArrayList<>();
     private List<BoosterCode> tooHotBoosters = new ArrayList<>();
     private List<Point> toVisit; // FIXME: Performance: can we use a faster data structure for this?
+    private List<Point> telePortTargets = new ArrayList<>();
 
     State(Grid grid, List<BoosterLocation> boosters) {
         this.gridBoosters = boosters;
@@ -89,5 +90,13 @@ class State {
         mildlyWarmBoosters.clear();
         mildlyWarmBoosters.addAll(tooHotBoosters);
         tooHotBoosters.clear();
+    }
+
+    void addTeleportTarget(Point position) {
+        telePortTargets.add(position);
+    }
+
+    boolean isTeleportTarget(Point target) {
+        return telePortTargets.contains(target);
     }
 }

@@ -27,7 +27,7 @@ public class Pathfinder{
         }
     }
 
-    public final List<StarNode> findPath(Point start, Point end) {
+    private List<StarNode> findPath(Point start, Point end) {
         openList.clear();
         closedList = new HashSet<>();
         openList.add(nodes[start.getX()][start.getY()]);

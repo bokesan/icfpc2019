@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static icfpc2019.Action.*;
+import static icfpc2019.Direction.SOUTH;
 
 public class CounterClockwiseSolver implements Solver {
 
@@ -28,15 +29,13 @@ public class CounterClockwiseSolver implements Solver {
 
     @Override
     public String solve() {
+        Robot robot = robots.get(0);
 
         //collect all manipulators and attach to the right
-        //todo first collect manipulators
-        //setupManipulators(robot, state);
+        setupManipulators(robot);
 
         //todo do cloning?
         //todo set up teleports?
-
-        Robot robot = robots.get(0);
 
         while (!state.mapFinished()) {
             //find an empty field next to a wall or wrapped field
@@ -51,7 +50,9 @@ public class CounterClockwiseSolver implements Solver {
                 Point right = getMyRight(robot);
                 if (state.needsWrapping(right)) {
                     //System.out.println("Turning right");
-                    performAction(E, robot);
+                    if (state.needsWrapping(getDoubleRight(robot))) {
+                        performAction(E, robot);
+                    }
                     move(robot, right);
                     continue;
                 }
@@ -70,6 +71,42 @@ public class CounterClockwiseSolver implements Solver {
             }
         }
         return combineResults();
+    }
+
+    private Point getDoubleRight(Robot robot) {
+        // we move with our manipulators trailing behind, so this is kinda flipped
+        switch (robot.direction) {
+            case SOUTH: return robot.position.right().right();
+            case NORTH: return robot.position.left().left();
+            case WEST:  return robot.position.down().down();
+            case EAST:  return robot.position.up().up();
+            default: throw new RuntimeException("Invalid direction: " + robot.direction.name());
+        }
+    }
+
+    private void setupManipulators(Robot robot) {
+        List<Point> manipulatorBoosters = state.getBoosterLocations(BoosterCode.B);
+        while (!manipulatorBoosters.isEmpty()) {
+            Point next = getNearestPoint(manipulatorBoosters, robot.position);
+            moveUntilThere(robot, next);
+            performAction(B, robot);
+            manipulatorBoosters = state.getBoosterLocations(BoosterCode.B);
+        }
+    }
+
+    private Point getNearestPoint(List<Point> points, Point start) {
+        if (points.isEmpty()) return null;
+        Point best = points.get(0);
+        int distance = finder.getPathLength(start, best);
+        points.remove(0);
+        for (Point p : points) {
+            int d = finder.getPathLength(start, p);
+            if (d < distance) {
+                best = p;
+                distance = d;
+            }
+        }
+        return best;
     }
 
     private boolean hasFreeNeighbours(Robot robot) {
@@ -129,10 +166,27 @@ public class CounterClockwiseSolver implements Solver {
     }
 
     private void moveUntilFree(Robot robot, List<Point> path) {
+        int maxLength = 20 + cutPathCounter;
+        int steps = 0;
         for (Point p : path) {
             move(robot, p);
+            steps++;
             //as soon as we find an area to fill, we go for it
-            if (hasFreeNeighbours(robot)) break;
+            if (hasFreeNeighbours(robot)) {
+                cutPathCounter = 0;
+                break;
+            }
+            if (steps > maxLength) {
+                cutPathCounter += 10;
+                break;
+            }
+        }
+    }
+
+    private void moveUntilThere(Robot robot, Point target) {
+        List<Point> path = finder.getPath(robot.position, target);
+        for (Point p : path) {
+            move(robot, p);
         }
     }
 
@@ -154,15 +208,57 @@ public class CounterClockwiseSolver implements Solver {
             case A: //FALLTHROUGH
             case S: //FALLTHROUGH
             case D: robot.singleStep(action); //fixme: this entire stuff might happen twice if the robot has fast wheels
-                    markFieldsWrapped(robot);
-                    state.pickBoosterUp(robot.position);
-                    break;
+                markFieldsWrapped(robot);
+                state.pickBoosterUp(robot.position);
+                break;
             case Q: //FALLTHROUGH
             case E: robot.turn(action);
-                    markFieldsWrapped(robot);
-                    break;
+                markFieldsWrapped(robot);
+                break;
+            case B: state.removeBooster(BoosterCode.B);
+                attachManipulator(robot);
+                markFieldsWrapped(robot);
+                break;
             default: throw new RuntimeException("Action not implemented: " + action.name());
         }
+    }
+
+    private void attachManipulator(Robot robot) {
+        List<Point> manipulators = robot.getManipulators();
+        Point newPosition;
+        switch (robot.direction) {
+            case EAST:
+                for (int offs = 2; ; offs++) {
+                    newPosition = robot.position.translate(1, -offs);
+                    if (!manipulators.contains(newPosition))
+                        break;
+                }
+                break;
+            case WEST:
+                for (int offs = 2; ; offs++) {
+                    newPosition = robot.position.translate(-1, offs);
+                    if (!manipulators.contains(newPosition))
+                        break;
+                }
+                break;
+            case NORTH:
+                for (int offs = 2; ; offs++) {
+                    newPosition = robot.position.translate(offs, 1);
+                    if (!manipulators.contains(newPosition))
+                        break;
+                }
+                break;
+            case SOUTH:
+                for (int offs = 2; ; offs++) {
+                    newPosition = robot.position.translate(-offs, -1);
+                    if (!manipulators.contains(newPosition))
+                        break;
+                }
+                break;
+            default:
+                throw new AssertionError();
+        }
+        robot.attachManipulator(newPosition);
     }
 
     private void markFieldsWrapped(Robot robot) {

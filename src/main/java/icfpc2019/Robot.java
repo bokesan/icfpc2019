@@ -48,52 +48,6 @@ public class Robot {
             fastWheelUnits -= 1;
     }
 
-    private Point attachManipulator() {
-        //todo move to solver, change strategy
-        Point p;
-        switch (direction) {
-            case EAST:
-                for (int offs = 2; ; offs++) {
-                    p = position.translate(1, offs);
-                    if (!manipulators.contains(p))
-                        return p;
-                    p = position.translate(1, -offs);
-                    if (!manipulators.contains(p))
-                        return p;
-                }
-            case WEST:
-                for (int offs = 2; ; offs++) {
-                    p = position.translate(-1, offs);
-                    if (!manipulators.contains(p))
-                        return p;
-                    p = position.translate(-1, -offs);
-                    if (!manipulators.contains(p))
-                        return p;
-                }
-            case NORTH:
-                for (int offs = 2; ; offs++) {
-                    p = position.translate(offs, 1);
-                    if (!manipulators.contains(p))
-                        return p;
-                    p = position.translate(-offs, 1);
-                    if (!manipulators.contains(p))
-                        return p;
-                }
-            case SOUTH:
-                for (int offs = 2; ; offs++) {
-                    p = position.translate(offs, -1);
-                    if (!manipulators.contains(p))
-                        return p;
-                    p = position.translate(-offs, -1);
-                    if (!manipulators.contains(p))
-                        return p;
-                }
-            default:
-                throw new AssertionError();
-        }
-    }
-
-
     private void turnLeft(){
         Direction manipulationWay = null;
         List<Point> tempList = new LinkedList<>();
@@ -146,6 +100,13 @@ public class Robot {
             default: throw new RuntimeException("Invalid turning direction: " + action.name());
         }
         log.append(action.toString());
+        countTimeUnit();
+    }
+
+    public void attachManipulator(Point p) {
+        //todo check validity etc
+        manipulators.add(p);
+        log.append(Action.B.toString()).append(p.translate(Point.of(-position.getX(), -position.getY())).toString());
         countTimeUnit();
     }
 

@@ -53,4 +53,24 @@ class State {
     boolean needsWrapping(Point p) {
         return toVisit.contains(p);
     }
+
+    boolean mapHasBooster(BoosterCode booster) {
+        for (BoosterLocation location : gridBoosters) {
+            if (location.getBoosterCode() == booster) return true;
+        }
+        return false;
+    }
+
+    List<Point> getBoosterLocations(BoosterCode boosterCode) {
+        List<Point> result = new ArrayList<>();
+        for (BoosterLocation location : gridBoosters) {
+            if (location.getBoosterCode() == boosterCode) result.add(location.getPoint());
+        }
+        return result;
+    }
+
+    public void removeBooster(BoosterCode b) {
+        if (!availableBoosters.contains(b)) throw new RuntimeException("Booster not available: " + b.name());
+        availableBoosters.remove(b);
+    }
 }

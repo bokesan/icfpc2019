@@ -18,7 +18,8 @@ public class RobotTest {
         // a new robot should face east
         assertEquals(p, r.position);
         Collection<Point> man = r.getManipulators();
-        assertEquals(3, man.size());
+        assertEquals(4, man.size());
+        assertTrue(man.contains(p));
         assertTrue(man.contains(p.right()));
         assertTrue(man.contains(p.right().up()));
         assertTrue(man.contains(p.right().down()));
@@ -28,13 +29,13 @@ public class RobotTest {
     public void testMoveRight() {        
         Point p = Point.of(10, 20);        
         Point p1 = p.right();
-        StarNode node = new StarNode(p1.getX(), p1.getY());       
         Robot r = new Robot(p);
-        r.move(node);
+        r.singleStep(Action.D);
         // a new robot should face east
         assertEquals(p1, r.position);
         Collection<Point> man = r.getManipulators();
-        assertEquals(3, man.size());
+        assertEquals(4, man.size());
+        assertTrue(man.contains(p1));
         assertTrue(man.contains(p1.right()));
         assertTrue(man.contains(p1.right().up()));
         assertTrue(man.contains(p1.right().down()));

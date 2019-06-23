@@ -13,7 +13,7 @@ public class Pathfinder{
     private int width;
     private int height;
 
-    public void initNodes(Grid grid, List<BoosterLocation> boosters){
+    public void initNodes(Grid grid){
         width = grid.getFields().length -1;
         height = grid.getFields()[0].length -1;
         nodes = new StarNode[width+1][height+1];
@@ -27,7 +27,7 @@ public class Pathfinder{
         }
     }
 
-    public final List<StarNode> findPath(Point start, Point end, int penalty, boolean mayTeleport) {
+    public final List<StarNode> findPath(Point start, Point end) {
         openList.clear();
         closedList = new HashSet<>();
         openList.add(nodes[start.getX()][start.getY()]);
@@ -40,14 +40,11 @@ public class Pathfinder{
             if ((current.getXPosition() == end.getX()) && (current.getYPosition() == end.getY())) {
                 return calcPath(nodes[start.getX()][start.getY()], current);
             }
-            List<StarNode> adjacentNodes = getAdjacent(current, mayTeleport);
+            List<StarNode> adjacentNodes = getAdjacent(current);
             for (StarNode currentAdj : adjacentNodes) {
                 if (!openList.contains(currentAdj)) {
                     currentAdj.setPrevious(current);
                     currentAdj.sethCosts(nodes[start.getX()][start.getY()], nodes[end.getX()][end.getY()]);
-                    if (isDirectionChange(current, currentAdj) && !currentAdj.isTeleport()) {
-                        currentAdj.setMovementPanelty(penalty);
-                    }
                     currentAdj.setgCosts(current);
                     openList.add(currentAdj);
                 } else {
@@ -60,7 +57,7 @@ public class Pathfinder{
         }
     }
 
-    private ArrayList<StarNode> getAdjacent(StarNode current, boolean mayTeleport) {
+    private ArrayList<StarNode> getAdjacent(StarNode current) {
         int x = current.getXPosition();
         int y = current.getYPosition();
         ArrayList<StarNode> adj = new ArrayList<>();
@@ -84,13 +81,11 @@ public class Pathfinder{
             temp = nodes[x][y+1];
             tryAddTempToAdjacent(adj, temp);
         }
-        if (mayTeleport) {
             for (Point p : teleporters) {
                 StarNode teleporterNode = nodes[p.getX()][p.getY()];
                 teleporterNode.setIsTeleport(true);
                 tryAddTempToAdjacent(adj, teleporterNode);
             }
-        }
         return adj;
     }
     private void tryAddTempToAdjacent(ArrayList<StarNode> adj, StarNode temp){
@@ -98,12 +93,6 @@ public class Pathfinder{
             temp.setIsDiagonaly(false);
             adj.add(temp);
         }
-    }
-
-    private boolean isDirectionChange(StarNode current, StarNode next){
-        if (current.getPrevious() == null)
-            return false;
-        return current.getXPosition() == current.getPrevious().getXPosition() && current.getPrevious().getXPosition() == next.getXPosition() || current.getYPosition() == current.getPrevious().getYPosition() && current.getPrevious().getYPosition() == next.getYPosition();
     }
 
     private List<StarNode> calcPath(StarNode start, StarNode goal) {
@@ -119,13 +108,13 @@ public class Pathfinder{
     }
 
     public int getPathLength(Point from, Point to) {
-        //TODO optimize
-        return findPath(from, to, 0 , false).size();
+        //TODO can this be optimized?
+        return findPath(from, to).size();
     }
 
     public List<Point> getPath(Point from, Point to) {
         //TODO optimize
-        List<StarNode> starPath = findPath(from, to, 0, false);
+        List<StarNode> starPath = findPath(from, to);
         List<Point> path = new ArrayList<>();
         for (StarNode node : starPath) {
             path.add(node.getAsPoint());

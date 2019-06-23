@@ -2,6 +2,7 @@ package icfpc2019;
 
 import icfpc2019.pathfinder.Pathfinder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static icfpc2019.Action.*;
@@ -11,13 +12,14 @@ public class CounterClockwiseSolver implements Solver {
     private Pathfinder finder;
     private Grid grid;
     private State state;
-    private List<Robot> robots;
+    private List<Robot> robots = new ArrayList<>();
+    private int cutPathCounter = 0;
 
     @Override
     public void init(ProblemDesc problem) {
         grid = Grid.of(problem);
         finder = new Pathfinder();
-        finder.initNodes(grid, problem.getBoosters());
+        finder.initNodes(grid);
         state = new State(grid, problem.getBoosters());
         Robot robot = new Robot(problem.getInitialWorkerLocation());
         robots.add(robot);
@@ -40,35 +42,77 @@ public class CounterClockwiseSolver implements Solver {
             //find an empty field next to a wall or wrapped field
             //orient "backwards" with manipulators trailing and pointing away from wall
             setupStartLocation(robot);
+            //System.out.println("Set Up Position");
 
             //fill that connected area
-            loop: while(true) {
-                //if all adjacent fields are filled, break
-                for (Point p : robot.position.adjacent()) {
-                    if (state.needsWrapping(p)) continue;
-                    break loop;
+            //if all adjacent fields are filled, break
+            while (hasFreeNeighbours(robot)) {
+                //if there is no wall/wrap to my right, turn right and move forward
+                Point right = getMyRight(robot);
+                if (state.needsWrapping(right)) {
+                    //System.out.println("Turning right");
+                    performAction(E, robot);
+                    move(robot, right);
+                    continue;
                 }
 
-                //if there is no wall/wrap to my right, turn right and move forward
+                //if there is a need for wrap ahead, move on
+                Point front = getMyFront(robot);
+                if (state.needsWrapping(front)) {
+                    //System.out.println("Moving forward");
+                    move(robot, front);
+                    continue;
+                }
 
-                //if there is a wall in front, turn left
-
-                //otherwise, move forward
-
+                //otherwise, turn left
+                performAction(Q, robot);
+                //System.out.println("Turning left");
             }
-
         }
         return combineResults();
+    }
+
+    private boolean hasFreeNeighbours(Robot robot) {
+        boolean trapped = true;
+        for (Point p : robot.position.adjacent()) {
+            if (state.needsWrapping(p)) {
+                trapped = false;
+                break;
+            }
+        }
+        return !trapped;
+    }
+
+    private Point getMyFront(Robot robot) {
+        // we move with our manipulators trailing behind, so this is kinda flipped
+        switch (robot.direction) {
+            case SOUTH: return robot.position.up();
+            case NORTH: return robot.position.down();
+            case WEST:  return robot.position.right();
+            case EAST:  return robot.position.left();
+            default: throw new RuntimeException("Invalid direction: " + robot.direction.name());
+        }
+    }
+
+    private Point getMyRight(Robot robot) {
+        // we move with our manipulators trailing behind, so this is kinda flipped
+        switch (robot.direction) {
+            case SOUTH: return robot.position.right();
+            case NORTH: return robot.position.left();
+            case WEST:  return robot.position.down();
+            case EAST:  return robot.position.up();
+            default: throw new RuntimeException("Invalid direction: " + robot.direction.name());
+        }
     }
 
     private void setupStartLocation(Robot robot) {
         //find the nearest empty field
         List<Point> targets = state.getUnwrappedPoints();
         Point best = targets.get(0);
-        int bestDistance = finder.getPathLength(robot.position, best);
+        int bestDistance = getManhattanDistance(robot.position, best);
 
         for (Point p : targets) {
-            int distance = finder.getPathLength(robot.position, best);
+            int distance = getManhattanDistance(robot.position, p);
             if (distance < bestDistance) {
                 bestDistance = distance;
                 best = p;
@@ -76,13 +120,19 @@ public class CounterClockwiseSolver implements Solver {
         }
 
         List<Point> path = finder.getPath(robot.position, best);
-        move(robot, path);
+        moveUntilFree(robot, path);
     }
 
-    private void move(Robot robot, List<Point> path) {
+    private int getManhattanDistance(Point from, Point to) {
+        return Math.abs(from.getX() - to.getX()) +
+                Math.abs(from.getY() - to.getY());
+    }
+
+    private void moveUntilFree(Robot robot, List<Point> path) {
         for (Point p : path) {
-            //todo do we want to turn, maybe?
             move(robot, p);
+            //as soon as we find an area to fill, we go for it
+            if (hasFreeNeighbours(robot)) break;
         }
     }
 
@@ -106,6 +156,10 @@ public class CounterClockwiseSolver implements Solver {
             case D: robot.singleStep(action); //fixme: this entire stuff might happen twice if the robot has fast wheels
                     markFieldsWrapped(robot);
                     state.pickBoosterUp(robot.position);
+                    break;
+            case Q: //FALLTHROUGH
+            case E: robot.turn(action);
+                    markFieldsWrapped(robot);
                     break;
             default: throw new RuntimeException("Action not implemented: " + action.name());
         }

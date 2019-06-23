@@ -1,7 +1,5 @@
 package icfpc2019.pathfinder;
 
-import java.util.LinkedList;
-import java.util.List;
 
 import icfpc2019.Point;
 
@@ -11,7 +9,6 @@ public class StarNode {
     private StarNode previous;
     private double gCosts;
     private double hCosts;
-    private int movementPenalty = 0;
     private boolean isWalkable;
     private boolean isTeleport;
 
@@ -26,23 +23,23 @@ public class StarNode {
     public Point getAsPoint(){
         return Point.of(x, y);
     }
-    public int getMovementPenalty(){
-        return movementPenalty;
-    }
 
     public StarNode(int x, int y){
         this.x = x;
         this.y = y;
     }
+
     public void setPrevious(StarNode node){
         this.previous = node;
     }
+
     //uses euclidean distance
 	public void sethCosts(StarNode starNode) {
         int dx = absolute(this.getXPosition() - starNode.getXPosition());
         int dy = absolute(this.getYPosition() - starNode.getYPosition());
         this.hCosts = (int) (BASICMOVEMENTCOST * Math.sqrt(dx * dx + dy * dy));
     }
+
     public void sethCosts(StarNode start, StarNode goal){
         int dx1 = this.getXPosition() - goal.getXPosition();
         int dy1 = this.getYPosition() - goal.getYPosition();
@@ -51,46 +48,54 @@ public class StarNode {
         int cross = absolute(dx1*dy2 - dx2*dy1);
         this.hCosts += cross*0.001;
     }
+
     private void setgCosts(double gCosts) {               
-        this.gCosts = gCosts + movementPenalty;                
+        this.gCosts = gCosts;
     }
+
     public void setgCosts(StarNode previousNode, double basicCost) {
         setgCosts(previousNode.getgCosts() + basicCost);
     }
+
 	public void setgCosts(StarNode previousNode) { 
         setgCosts(previousNode, BASICMOVEMENTCOST);
     }
-    public void setMovementPanelty(int movementPanelty) {
-        this.movementPenalty = movementPanelty;
-    }
+
     public void setIsWalkable(boolean isWalkable){
         this.isWalkable = isWalkable;
     }
+
 	public double getgCosts() {
 		return gCosts;
     }
+
     public double gethCosts(){
         return hCosts;
     }
    
 
 	public double calculategCosts(StarNode current) {
-		return current.getgCosts() + BASICMOVEMENTCOST + movementPenalty;
+		return current.getgCosts() + BASICMOVEMENTCOST;
 	}
+
 	public StarNode getPrevious() {
 		return previous;
 	}
+
 	public double getfCosts() {
         if(this.isTeleport)
            return BASICMOVEMENTCOST;
 		return gCosts + hCosts;
 	}
+
 	public boolean isWalkable() {
 		return isWalkable;
     }
+
     public boolean isTeleport(){
         return isTeleport;
     }
+
 	public void setIsDiagonaly(boolean b) {
     }
     

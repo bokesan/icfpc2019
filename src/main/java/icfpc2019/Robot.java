@@ -3,14 +3,12 @@ package icfpc2019;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import icfpc2019.pathfinder.StarNode;
 
 public class Robot {
 
     Point position;
     Direction direction;
     private List<Point> manipulators;
-    private List<BoosterCode> gatheredBosters;
     private StringBuilder log = new StringBuilder();
     private int fastWheelUnits = 0;
     private int drillUnits = 0;
@@ -18,7 +16,6 @@ public class Robot {
     public Robot(Point position) {
         this.position = position;
         manipulators = new ArrayList<>();
-        gatheredBosters = new LinkedList<>();
         initBaseManipulators();
         direction = Direction.EAST;
     }
@@ -37,37 +34,6 @@ public class Robot {
         manipulators.add(manipulatorExtension);
     }
 
-    public void move(StarNode node){
-        int dx = node.getXPosition() - position.getX();
-        int dy = node.getYPosition() - position.getY();
-        Action action;
-        if (dy == 0 && !node.isTeleport()) {
-            switch (dx) {
-                case -1:  action = Action.A; break;
-                case 1:   action = Action.D; break;
-                default: throw new InvalidMoveException(position, node.getAsPoint());
-            }
-        } else if (dx == 0 && !node.isTeleport()) {
-            switch (dy) {
-                case -1:  action = Action.S; break;
-                case 1:   action = Action.W; break;
-                default: throw new InvalidMoveException(position, node.getAsPoint());
-            }
-        } else if(node.isTeleport()) {
-            action = Action.T;
-        } else {
-            throw new InvalidMoveException(position, node.getAsPoint());
-        }
-        if(action == Action.T) {
-            log(action, node.getAsPoint());
-        } else {
-            log(action);
-        }
-        moveManipulators(dx, dy);
-        countTimeUnit();
-        position = node.getAsPoint();
-    }
-
     private void moveManipulators(int x, int y) {
         int n = manipulators.size();
         for (int i = 0; i < n; i++) {
@@ -80,62 +46,6 @@ public class Robot {
             drillUnits -= 1;
         if(fastWheelUnits > 0)
             fastWheelUnits -= 1;
-    }
-
-    void spin(Action action) {
-        switch (action) {
-            case E:
-                turnRight();
-                log(action);
-                countTimeUnit();
-                break;
-            case Q:
-                turnLeft();
-                log(action);
-                countTimeUnit();
-                break;
-            default:
-                throw new AssertionError();
-        }
-    }
-
-    void addBooster(BoosterCode boosterCode){
-        gatheredBosters.add(boosterCode);
-    }
-
-    List<BoosterCode> getGatheredBoosters(){
-        return gatheredBosters;
-    }
-
-    void useBooster(BoosterCode boosterCode){
-        countTimeUnit();
-        if(gatheredBosters.contains(boosterCode)){
-            gatheredBosters.remove(boosterCode);
-            boost(boosterCode);
-        }
-    }
-
-    private void boost(BoosterCode boosterCode) {
-        switch(boosterCode){
-            case B:
-                // attach to side of existing manipulators
-                Point p = attachManipulator();
-                manipulators.add(p);
-                log(Action.B, Point.of(p.getX() - position.getX(), p.getY() - position.getY()));
-                break;
-            case F:
-                fastWheelUnits = 50;
-                break;
-            case L:
-                drillUnits = 30;
-                break;
-            case R:
-                log(Action.R);
-                break;
-            case C:
-                log(Action.C);
-                break;
-        }
     }
 
     private Point attachManipulator() {
@@ -210,12 +120,6 @@ public class Robot {
         manipulators = tempList;
     }
 
-    private void turnRight(){
-        turnLeft();
-        turnLeft();
-        turnLeft();
-    }
-
     String getActionLog() {
         return log.toString();
     }
@@ -224,14 +128,25 @@ public class Robot {
         return new ArrayList<>(manipulators);
     }
 
-    public void singleStep(Action action) {
+    void singleStep(Action action) {
         switch (action) {
-            case W: position = position.up();    break;
-            case A: position = position.left();  break;
-            case S: position = position.down();  break;
-            case D: position = position.right(); break;
+            case W: position = position.up();       moveManipulators(0, 1);     break;
+            case A: position = position.left();     moveManipulators(-1, 0);    break;
+            case S: position = position.down();     moveManipulators(0, -1);    break;
+            case D: position = position.right();    moveManipulators(1, 0);     break;
         }
         log.append(action.toString());
+        countTimeUnit();
+    }
+
+    public void turn(Action action) {
+        switch (action) {
+            case Q: turnLeft(); break;
+            case E: turnLeft(); turnLeft(); turnLeft(); break;
+            default: throw new RuntimeException("Invalid turning direction: " + action.name());
+        }
+        log.append(action.toString());
+        countTimeUnit();
     }
 
     public static class ExtensionException extends RuntimeException {

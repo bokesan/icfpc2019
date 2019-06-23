@@ -35,8 +35,8 @@ public class CounterClockwiseSolver implements Solver {
                     //the robot needs advise - figure out what to do
                     discoverAction(robot);
                 }
-                //if the robot knows what to do, let him (if he doesnt, we are actually done)
-                if (robot.knowsWhatToDo()) performAction(robot); //todo let him wait otherwise to stay synced
+                //if the robot knows what to do, let him (if he doesnt, we are actually done
+                if (robot.knowsWhatToDo()) performAction(robot);
             }
         }
         return combineResults();

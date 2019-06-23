@@ -7,6 +7,7 @@ class State {
 
     private List<BoosterLocation> gridBoosters;
     private List<BoosterCode> availableBoosters = new ArrayList<>();
+    private List<BoosterCode> mildlyWarmBoosters = new ArrayList<>();
     private List<BoosterCode> tooHotBoosters = new ArrayList<>();
     private List<Point> toVisit; // FIXME: Performance: can we use a faster data structure for this?
 
@@ -66,7 +67,9 @@ class State {
     }
 
     void coolBoosterDown() {
-        availableBoosters.addAll(tooHotBoosters);
+        availableBoosters.addAll(mildlyWarmBoosters);
+        mildlyWarmBoosters.clear();
+        mildlyWarmBoosters.addAll(tooHotBoosters);
         tooHotBoosters.clear();
     }
 }

@@ -3,6 +3,7 @@ module Types ( Point(..)
              , north, east, south, west
              , neighbors
              , manhattanDistance
+             , distanceSquared
              , nat
              , point
              , Action(..))
@@ -31,6 +32,10 @@ neighbors p = [north p, east p, south p, west p]
 manhattanDistance :: Point -> Point -> Int
 manhattanDistance (Point x1 y1) (Point x2 y2) = abs (x1 - x2) + abs (y1 - y2)
 
+distanceSquared :: Point -> Point -> Int
+distanceSquared (Point x1 y1) (Point x2 y2) = square (x1 - x2) + square (y1 - y2)
+  where
+    square n = n * n
 
 nat :: Parsec String st Int
 nat = read <$> many1 digit

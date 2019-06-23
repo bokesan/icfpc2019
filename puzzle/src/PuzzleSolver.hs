@@ -72,7 +72,7 @@ border n = fromWalls ([Point 0  i | i <- [0 .. n']] ++
   where n' = n - 1
 
 nearestTo :: Grid -> Point -> Point
-nearestTo grid point = snd (minimum [(manhattanDistance p point, p) | p <- allWalls grid])
+nearestTo grid point = snd (minimum [(distanceSquared p point, p) | p <- allWalls grid])
 
 -- grow puzzle grid src dest
 --  grow walls from existing wall src to and including dest
@@ -80,7 +80,7 @@ grow :: Puzzle -> Grid -> Point -> Point -> [Grid]
 grow puzzle grid src dest
   | src == dest = [grid]
   | otherwise   = let ns = [p | p <- neighbors src, not (isWall grid p), p `notElem` iSqs puzzle]
-                      ans = map snd (sort [(manhattanDistance p dest, p) | p <- ns])
+                      ans = map snd (sort [(distanceSquared p dest, p) | p <- ns])
                   in concat [grow puzzle (addWall grid p) p dest | p <- ans]
 
 allOpen :: Grid -> [Point]

@@ -2,7 +2,7 @@ package icfpc2019;
 
 import org.junit.Test;
 
-import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -78,7 +78,7 @@ public class GridTest {
     @Test
     public void testGetFreeSquares() {
         Grid grid = Grid.of(10, 10, Point.origin(), Point.of(4,5));
-        List<Point> free = grid.getFreeSquares();
+        Set<Point> free = grid.getFreeSquares();
         assertEquals(98, free.size());
     }
 }

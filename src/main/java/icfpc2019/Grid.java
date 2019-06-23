@@ -1,15 +1,13 @@
 package icfpc2019;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Grid {
 
     /** If true the coordinate is free, if false it is an obstacle or outside the map. */
     private final boolean[][] fields;
-    public final Point min;
-    public final Point max;
+    private final Point min;
+    private final Point max;
 
     private Grid(boolean[][] fields, Point min, Point max) {
         this.fields = fields;
@@ -88,6 +86,10 @@ public class Grid {
         return isFree(p.getX(), p.getY());
     }
 
+    private boolean isFree(Point p, int dx, int dy) {
+        return isFree(p.getX() + dx, p.getY() + dy);
+    }
+
     public boolean[][] getFields(){
         return fields;
     }
@@ -107,8 +109,11 @@ public class Grid {
         return builder.toString();
     }
 
-    public List<Point> getFreeSquares() {
-        List<Point> result = new ArrayList<>((max.getX() - min.getX()) * (max.getY() - min.getY()) / 2);
+    /**
+     * Return a newly allocated mutable Set of the unwrapped sqares.
+     */
+    public Set<Point> getFreeSquares() {
+        Set<Point> result = new HashSet<>((max.getX() - min.getX()) * (max.getY() - min.getY()));
         for (int x = min.getX(); x < max.getX(); x++) {
             for (int y = min.getY(); y < max.getY(); y++) {
                 if (fields[x][y]) {
@@ -138,12 +143,12 @@ public class Grid {
             int dir = sign(dx);
             int d2 = dist >>> 1;
             for (int i = 1; i <= d2; i++) {
-                if (!isFree(p1.translate(i * dir, 0))) {
+                if (!isFree(p1, i * dir, 0)) {
                     return false;
                 }
             }
             for (int i = d2 + (dist & 1); i < dist; i++) {
-                if (!isFree(p1.translate(i * dir, dy))) {
+                if (!isFree(p1, i * dir, dy)) {
                     return false;
                 }
             }
@@ -153,12 +158,12 @@ public class Grid {
             int dir = sign(dy);
             int d2 = dist >>> 1;
             for (int i = 1; i <= d2; i++) {
-                if (!isFree(p1.translate(0, i * dir))) {
+                if (!isFree(p1, 0, i * dir)) {
                     return false;
                 }
             }
             for (int i = d2 + (dist & 1); i < dist; i++) {
-                if (!isFree(p1.translate(dx, i * dir))) {
+                if (!isFree(p1, dx, i * dir)) {
                     return false;
                 }
             }

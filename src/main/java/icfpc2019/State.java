@@ -1,7 +1,9 @@
 package icfpc2019;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 class State {
 
@@ -9,7 +11,7 @@ class State {
     private List<BoosterCode> availableBoosters = new ArrayList<>();
     private List<BoosterCode> mildlyWarmBoosters = new ArrayList<>();
     private List<BoosterCode> tooHotBoosters = new ArrayList<>();
-    private List<Point> toVisit; // FIXME: Performance: can we use a faster data structure for this?
+    private Set<Point> toVisit;
     private List<Point> telePortTargets = new ArrayList<>();
 
     State(Grid grid, List<BoosterLocation> boosters) {
@@ -41,9 +43,22 @@ class State {
         toVisit.remove(p);
     }
 
-    List<Point> getUnwrappedPoints() {
-        return new ArrayList<>(toVisit);
+    /**
+     * Get unwrapped point nearest to the target by manhattan distance.
+     */
+    Point getNearestUnwrapped(Point target) {
+        Point nearest = null;
+        int minDist = Integer.MAX_VALUE;
+        for (Point p : toVisit) {
+            int dist = target.manhattanDistance(p);
+            if (dist < minDist) {
+                minDist = dist;
+                nearest = p;
+            }
+        }
+        return nearest;
     }
+
 
     void pickBoosterUp(Point position) {
         for (BoosterLocation booster : gridBoosters) {

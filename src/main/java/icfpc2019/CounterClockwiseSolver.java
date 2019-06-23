@@ -194,29 +194,14 @@ public class CounterClockwiseSolver implements Solver {
 
     private void setupStartLocation(Robot robot) {
         //find the nearest empty field
-        List<Point> targets = state.getUnwrappedPoints();
-        if (targets.isEmpty()) {
+        Point best = state.getNearestUnwrapped(robot.position);
+        if (best == null) {
             //we are done, yay!
             return;
-        }
-        Point best = targets.get(0);
-        int bestDistance = getManhattanDistance(robot.position, best);
-
-        for (Point p : targets) {
-            int distance = getManhattanDistance(robot.position, p);
-            if (distance < bestDistance) {
-                bestDistance = distance;
-                best = p;
-            }
         }
 
         List<Point> path = finder.getPath(robot.position, best);
         moveUntilFree(robot, path);
-    }
-
-    private int getManhattanDistance(Point from, Point to) {
-        return Math.abs(from.getX() - to.getX()) +
-                Math.abs(from.getY() - to.getY());
     }
 
     private void moveUntilFree(Robot robot, List<Point> path) {

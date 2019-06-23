@@ -56,6 +56,10 @@ public class Point {
         return of(x + offset.x, y + offset.y);
     }
 
+    public int manhattanDistance(Point p) {
+        return Math.abs(x - p.x) + Math.abs(y - p.y);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -75,7 +79,7 @@ public class Point {
         return "(" + x + "," + y + ")";
     }
 
-    List<Point> adjacent() {
-        return new ArrayList<Point>() {{add(up()); add(down()); add(left()); add(right());}};
+    Point[] adjacent() {
+        return new Point[]{ up(), down(), left(), right() };
     }
 }

@@ -16,6 +16,24 @@ class State {
         this.gridBoosters = boosters;
         this.toVisit = grid.getFreeSquares();
     }
+    State(Grid grid, List<BoosterLocation> boosters, String shoppingList){
+        this(grid, boosters);
+        availableBoosters.addAll(checkoutShoppinglist(shoppingList));
+    }
+    
+    private List<BoosterCode> checkoutShoppinglist(String shoppingList){
+        char[] items = shoppingList.toCharArray();
+        List<BoosterCode> boughtItems = new ArrayList<>();
+        for(char item : items){            
+            try{                
+                boughtItems.add(BoosterCode.valueOf(String.valueOf(item)));
+            }catch(IllegalArgumentException illegalArgument){
+                //not contained
+            }
+        }        
+        return boughtItems;
+    }
+    
 
     boolean mapFinished() {
         return toVisit.isEmpty();

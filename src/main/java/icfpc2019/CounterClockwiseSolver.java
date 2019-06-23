@@ -29,6 +29,16 @@ public class CounterClockwiseSolver implements Solver {
         robots.add(robot);
         markFieldsWrapped(robot);
     }
+    @Override
+    public void init(ProblemDesc problem, String shoppinglist){
+        grid = Grid.of(problem);
+        finder = new Pathfinder();
+        finder.initNodes(grid);
+        state = new State(grid, problem.getBoosters(), shoppinglist);
+        Robot robot = new Robot(problem.getInitialWorkerLocation());
+        robots.add(robot);
+        markFieldsWrapped(robot);        
+    }
 
     @Override
     public String solve() {

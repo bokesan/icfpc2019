@@ -2,6 +2,7 @@ package icfpc2019;
 
 import java.io.File;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -24,40 +25,53 @@ public class App {
             if (PARALLEL) {
                 Arrays.stream(args, 2, args.length)
                         .parallel()
-                        .forEach(p -> safeSolveProblem(p, targetFile(p, targetDir)));
+                        .forEach(p -> safeSolveProblem(p, targetFile(p, targetDir), buyoutFile(p, targetDir)));
             } else {
                 SortedSet<String> problems = new TreeSet<>(Arrays.asList(args).subList(2, args.length));
                 for (String p : problems) {
-                    safeSolveProblem(p, targetFile(p, targetDir));
+                    safeSolveProblem(p, targetFile(p, targetDir), buyoutFile(p, targetDir));
                 }
             }
+        } else if (args.length > 2) {
+            solveProblem(args[0], args[1], args[2]);
         } else if (args.length > 1) {
-            solveProblem(args[0], args[1]);
+            solveProblem(args[0], args[1], "");
         } else {
-            solveProblem(args[0], null);
+            solveProblem(args[0], null, "");
         }
     }
 
-    private static void safeSolveProblem(String problemFile, String solutionFile) {
+    private static void safeSolveProblem(String problemFile, String solutionFile, String shoppinglistFile) {
         try {
-            solveProblem(problemFile, solutionFile);
+            solveProblem(problemFile, solutionFile, shoppinglistFile);
         } catch (IOException e) {
             System.err.println("Failed to solve " + problemFile + " because of " + e);
         }
     }
 
 
-    private static void solveProblem(String problemFile, String solutionFile) throws IOException {
+    private static void solveProblem(String problemFile, String solutionFile, String shoppingListFile) throws IOException {
         long startTime = System.nanoTime();
         String desc = readFile(problemFile);
+        String shoppingList = getShoppinglist(shoppingListFile);
         ProblemDesc problem = ProblemDesc.of(desc);
         System.out.format("Starting solver for %s ...\n", problemFile);
         Solver solver = new CounterClockwiseSolver();
-        solver.init(problem);
+        if(shoppingList.length() > 0)
+            solver.init(problem, shoppingList);
+        else
+            solver.init(problem);
         String result = solver.solve();
         writeResult(solutionFile, startTime, result);
     }
 
+    private static String getShoppinglist(String path) throws IOException{
+        String shoppingList  = "";
+        if(fileExists(path)){
+            shoppingList = readFile(path);
+        }        
+        return shoppingList;
+    }
     private static void writeResult(String solutionFile, long startTime, String result) throws IOException {
         if (solutionFile == null) {
             System.out.format("Solution length: %d\n", result.length());
@@ -79,14 +93,28 @@ public class App {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, StandardCharsets.UTF_8);
     }
+    private static boolean fileExists(String path){
+        return new File(path).exists();
+    }
 
     private static String targetFile(String path, String dir) {
         if (path.endsWith(".desc")) {
             path = path.substring(0, path.length() - 4) + "sol";
         }
+        int p = path.lastIndexOf(File.separatorChar);      
+        if (p < 0) {
+            return dir + File.separatorChar + path;
+        } else {
+            return dir + path.substring(p);
+        }
+    }
+    private static String buyoutFile(String path, String dir) {
+        if (path.endsWith(".desc")) {
+            path = path.substring(0, path.length() - 4) + "buy";
+        }
         int p = path.lastIndexOf(File.separatorChar);
         if (p < 0) {
-            return dir + File.separator + path;
+            return dir + File.separatorChar + path;
         } else {
             return dir + path.substring(p);
         }

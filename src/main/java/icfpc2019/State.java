@@ -24,11 +24,11 @@ class State {
 
     private List<BoosterCode> checkoutShoppinglist(String shoppingList){
         List<BoosterCode> boughtItems = new ArrayList<>();
-        for(char item : shoppingList.replaceAll("(\\r|\\n)", "").toCharArray()) {
+        for(char item : shoppingList.replaceAll("([\\r\\n])", "").toCharArray()) {
             try {
                 boughtItems.add(BoosterCode.valueOf(String.valueOf(item)));
             } catch(IllegalArgumentException illegalArgument){
-                throw new RuntimeException("Invalid booster code: " + item);
+                //throw new RuntimeException("Invalid booster code: " + item);
             }
         }
         return boughtItems;

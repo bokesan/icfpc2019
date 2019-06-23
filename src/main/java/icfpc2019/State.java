@@ -24,7 +24,7 @@ class State {
 
     private List<BoosterCode> checkoutShoppinglist(String shoppingList){
         List<BoosterCode> boughtItems = new ArrayList<>();
-        for(char item : shoppingList.toCharArray()) {
+        for(char item : shoppingList.replaceAll("(\\r|\\n)", "").toCharArray()) {
             try {
                 boughtItems.add(BoosterCode.valueOf(String.valueOf(item)));
             } catch(IllegalArgumentException illegalArgument){

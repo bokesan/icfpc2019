@@ -117,4 +117,19 @@ public class Pathfinder{
     public void addTeleport(Point teleport){
         teleporters.add(teleport);
     }
+
+    public int getPathLength(Point from, Point to) {
+        //TODO optimize
+        return findPath(from, to, 0 , false).size();
+    }
+
+    public List<Point> getPath(Point from, Point to) {
+        //TODO optimize
+        List<StarNode> starPath = findPath(from, to, 0, false);
+        List<Point> path = new ArrayList<>();
+        for (StarNode node : starPath) {
+            path.add(node.getAsPoint());
+        }
+        return path;
+    }
 }

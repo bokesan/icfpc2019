@@ -24,12 +24,13 @@ public class Robot {
     }
 
     private void initBaseManipulators(){
-        extendManipulators(Point.of(position.getX()+1, position.getY()));
-        extendManipulators(Point.of(position.getX()+1, position.getY()+1));
-        extendManipulators(Point.of(position.getX()+1, position.getY()-1));
+        addManipulator(Point.of(position.getX(), position.getY()));
+        addManipulator(Point.of(position.getX()+1, position.getY()));
+        addManipulator(Point.of(position.getX()+1, position.getY()+1));
+        addManipulator(Point.of(position.getX()+1, position.getY()-1));
     }
 
-    private void extendManipulators(Point manipulatorExtension){
+    private void addManipulator(Point manipulatorExtension){
         if(manipulators.contains(manipulatorExtension)) {
             throw new ExtensionException("Already extended");
         }
@@ -39,25 +40,25 @@ public class Robot {
     public void move(StarNode node){
         int dx = node.getXPosition() - position.getX();
         int dy = node.getYPosition() - position.getY();
-        Actions action;
+        Action action;
         if (dy == 0 && !node.isTeleport()) {
             switch (dx) {
-                case -1:  action = Actions.A; break;
-                case 1:   action = Actions.D; break;
+                case -1:  action = Action.A; break;
+                case 1:   action = Action.D; break;
                 default: throw new InvalidMoveException(position, node.getAsPoint());
             }
         } else if (dx == 0 && !node.isTeleport()) {
             switch (dy) {
-                case -1:  action = Actions.S; break;
-                case 1:   action = Actions.W; break;
+                case -1:  action = Action.S; break;
+                case 1:   action = Action.W; break;
                 default: throw new InvalidMoveException(position, node.getAsPoint());
             }
         } else if(node.isTeleport()) {
-            action = Actions.T;
+            action = Action.T;
         } else {
             throw new InvalidMoveException(position, node.getAsPoint());
         }
-        if(action == Actions.T) {
+        if(action == Action.T) {
             log(action, node.getAsPoint());
         } else {
             log(action);
@@ -81,17 +82,7 @@ public class Robot {
             fastWheelUnits -= 1;
     }
 
-    private void log(Actions action) {
-        log.append(action.toString());
-        //System.out.print(action.toString());
-    }
-
-    private void log(Actions action, Point target){
-        log.append(action.toString()).append("(").append(target.getX()).append(",").append(target.getY()).append(")");
-        //System.out.print(action.toString()+"("+target.getX()+","+target.getY()+")");
-    }
-
-    void spin(Actions action) {
+    void spin(Action action) {
         switch (action) {
             case E:
                 turnRight();
@@ -130,7 +121,7 @@ public class Robot {
                 // attach to side of existing manipulators
                 Point p = attachManipulator();
                 manipulators.add(p);
-                log(Actions.B, Point.of(p.getX() - position.getX(), p.getY() - position.getY()));
+                log(Action.B, Point.of(p.getX() - position.getX(), p.getY() - position.getY()));
                 break;
             case F:
                 fastWheelUnits = 50;
@@ -139,15 +130,16 @@ public class Robot {
                 drillUnits = 30;
                 break;
             case R:
-                log(Actions.R);
+                log(Action.R);
                 break;
             case C:
-                log(Actions.C);
+                log(Action.C);
                 break;
         }
     }
 
     private Point attachManipulator() {
+        //todo move to solver, change strategy
         Point p;
         switch (direction) {
             case EAST:
@@ -229,7 +221,17 @@ public class Robot {
     }
 
     public List<Point> getManipulators() {
-        return manipulators;
+        return new ArrayList<>(manipulators);
+    }
+
+    public void singleStep(Action action) {
+        switch (action) {
+            case W: position = position.up();    break;
+            case A: position = position.left();  break;
+            case S: position = position.down();  break;
+            case D: position = position.right(); break;
+        }
+        log.append(action.toString());
     }
 
     public static class ExtensionException extends RuntimeException {

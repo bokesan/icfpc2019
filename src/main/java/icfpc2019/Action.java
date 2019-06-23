@@ -1,6 +1,6 @@
 package icfpc2019;
 
-public enum Actions {
+public enum Action {
     W, //move up
     A, //move left
     S, //move down

@@ -1,5 +1,7 @@
 package icfpc2019;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Point {
@@ -71,5 +73,9 @@ public class Point {
     @Override
     public String toString() {
         return "(" + x + "," + y + ")";
+    }
+
+    List<Point> adjacent() {
+        return new ArrayList<Point>() {{add(up()); add(down()); add(left()); add(right());}};
     }
 }

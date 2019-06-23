@@ -1,8 +1,5 @@
 package icfpc2019;
 
-import icfpc2019.pathfinder.Pathfinder;
-import icfpc2019.pathfinder.StarNode;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -54,26 +51,13 @@ public class App {
         String desc = readFile(problemFile);
         ProblemDesc problem = ProblemDesc.of(desc);
         System.out.format("Starting solver for %s ...\n", problemFile);
-        Grid grid = Grid.of(problem);
-        Pathfinder finder = new Pathfinder();
-        finder.initNodes(grid, problem.getBoosters());
-        Robot initRobot = new Robot(problem.getInitialWorkerLocation());
-        State state = new State(grid, initRobot, problem.getBoosters(), finder);
-        while (!state.mapFinished()) {
-            int numRobots = state.getNumRobots();
-            for (int i = 0; i < numRobots; i++) {
-                Robot r = state.getRobot(i);
-                Point next = state.getNextPointToVisit(r, i == 0);
-                if (next == null) continue;
-                List<StarNode> starPath = finder.findPath(state.getCurrentPosition(r), next, 10, i == 0);
-                if (starPath.isEmpty()) {
-                    System.out.format("Empty path for robot %d/%d at %s\n", i, numRobots, r.position);
-                }
-                if (starPath.size() > 21) starPath = starPath.subList(0, 20);
-                state.move(r, starPath, i == 0);
-            }
-        }
-        String result = combineResults(state);
+        Solver solver = new CounterClockwiseSolver();
+        solver.init(problem);
+        String result = solver.solve();
+        writeResult(solutionFile, startTime, result);
+    }
+
+    private static void writeResult(String solutionFile, long startTime, String result) throws IOException {
         if (solutionFile == null) {
             System.out.format("Solution length: %d\n", result.length());
         } else {
@@ -82,16 +66,6 @@ public class App {
             System.out.format("Solution written to %s, length: %d, elapsed: %.3fs\n",
                     solutionFile, result.length(), elapsed / 1.0e9);
         }
-    }
-
-    private static String combineResults(State state) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(state.getResult(state.getRobot(0)));
-        for (int i = 1; i < state.getNumRobots(); i++) {
-            builder.append("#");
-            builder.append(state.getResult(state.getRobot(i)));
-        }
-        return builder.toString();
     }
 
     private static void writeFile(String path, String content) throws IOException {

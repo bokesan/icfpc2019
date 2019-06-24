@@ -9,11 +9,11 @@ public class Pathfinder{
     private final OpenList openList = new OpenList();
     private final Set<StarNode> closedList = new HashSet<>();
     private final List<Point> teleporters = new ArrayList<>();
-    private StarNode[][] nodes;
-    private int width;
-    private int height;
+    private final StarNode[][] nodes;
+    private final int width;
+    private final int height;
 
-    public void initNodes(Grid grid){
+    public Pathfinder(Grid grid){
         width = grid.getFields().length - 1;
         height = grid.getFields()[0].length - 1;
         nodes = new StarNode[width+1][height+1];
@@ -21,7 +21,7 @@ public class Pathfinder{
         for(int y = 0; y <= height; y++){
             for(int x = 0; x <= width; x++){
                 StarNode temp = new StarNode(x, y);                
-                temp.setIsWalkable(grid.isFree(Point.of(x, y)));
+                temp.setIsWalkable(grid.isFree(x, y));
                 nodes[x][y] = temp;
             }
         }

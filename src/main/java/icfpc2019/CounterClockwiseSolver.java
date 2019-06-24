@@ -24,8 +24,7 @@ public class CounterClockwiseSolver implements Solver {
     @Override
     public void init(ProblemDesc problem) {
         grid = Grid.of(problem);
-        finder = new Pathfinder();
-        finder.initNodes(grid);
+        finder = new Pathfinder(grid);
         state = new State(grid, problem.getBoosters());
         Robot robot = new Robot(problem.getInitialWorkerLocation());
         robots.add(robot);
@@ -34,8 +33,7 @@ public class CounterClockwiseSolver implements Solver {
     @Override
     public void init(ProblemDesc problem, String shoppinglist){
         grid = Grid.of(problem);
-        finder = new Pathfinder();
-        finder.initNodes(grid);
+        finder = new Pathfinder(grid);
         state = new State(grid, problem.getBoosters(), shoppinglist);
         Robot robot = new Robot(problem.getInitialWorkerLocation());
         robots.add(robot);

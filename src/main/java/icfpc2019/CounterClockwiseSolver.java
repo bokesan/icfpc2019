@@ -166,14 +166,10 @@ public class CounterClockwiseSolver implements Solver {
     }
 
     private boolean hasFreeNeighbours(Point point) {
-        boolean trapped = true;
-        for (Point p : point.adjacent()) {
-            if (state.needsWrapping(p)) {
-                trapped = false;
-                break;
-            }
-        }
-        return !trapped;
+        return state.needsWrapping(point.up()) ||
+               state.needsWrapping(point.down()) ||
+               state.needsWrapping(point.left()) ||
+               state.needsWrapping(point.right());
     }
 
     private Point getMyFront(Robot robot) {

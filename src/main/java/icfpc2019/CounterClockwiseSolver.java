@@ -93,6 +93,12 @@ public class CounterClockwiseSolver implements Solver {
             return;
         }
 
+        //collect teleporter
+        if (state.mapHasBooster(BoosterCode.R)) {
+            collectBooster(robot, BoosterCode.R);
+            return;
+        }
+
         //collect manipulator
         if (state.mapHasBooster(BoosterCode.B)) {
             collectBooster(robot, BoosterCode.B);

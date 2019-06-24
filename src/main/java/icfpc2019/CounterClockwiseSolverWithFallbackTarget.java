@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import static icfpc2019.Action.*;
 
-public class CounterClockwiseSolver implements Solver {
+public class CounterClockwiseSolverWithFallbackTarget implements Solver {
 
     private static final boolean DISTRIBUTE_EXTENSIONS_EVENLY = true;
     private static final boolean USE_TELEPORT = true;

@@ -73,7 +73,7 @@ public class CounterClockwiseSolver implements Solver {
         }
 
         //attach manipulator if we have less than the maximum (discount four for the body and starting manipulators)
-        if (state.boosterAvailable(BoosterCode.B) && robot.getManipulators().size() - 4 < extensionsPerBot) {
+        if (state.boosterAvailable(BoosterCode.B) && robot.getManipulatorCount() - 4 < extensionsPerBot) {
             scheduleAction(B, robot);
             return;
         }

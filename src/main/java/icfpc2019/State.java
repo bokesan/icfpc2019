@@ -84,12 +84,31 @@ class State {
         return false;
     }
 
+    int getGridBoosterCount(BoosterCode type) {
+        int n = 0;
+        for (BoosterLocation b : gridBoosters) {
+            if (b.getBoosterCode() == type) {
+                n++;
+            }
+        }
+        return n;
+    }
+
     List<Point> getBoosterLocations(BoosterCode boosterCode) {
         List<Point> result = new ArrayList<>();
         for (BoosterLocation location : gridBoosters) {
             if (location.getBoosterCode() == boosterCode) result.add(location.getPoint());
         }
         return result;
+    }
+
+    boolean hasSpawnPointAt(Point location) {
+        for (BoosterLocation b : gridBoosters) {
+            if (b.getBoosterCode() == BoosterCode.X && b.getPoint().equals(location)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     void removeBooster(BoosterCode b) {

@@ -1,6 +1,7 @@
 package icfpc2019;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -81,7 +82,11 @@ public class Robot {
     }
 
     public List<Point> getManipulators() {
-        return new ArrayList<>(manipulators);
+        return Collections.unmodifiableList(manipulators);
+    }
+
+    public int getManipulatorCount() {
+        return manipulators.size();
     }
 
     void singleStep(Action action) {

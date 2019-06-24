@@ -45,8 +45,8 @@ public class CounterClockwiseSolverWithFallbackTarget implements Solver {
     @Override
     public List<ActionSequence> solve() {
         if (DISTRIBUTE_EXTENSIONS_EVENLY) {
-            int numExtensions = state.getBoosterLocations(BoosterCode.B).size() + state.getNumAvailableBooster(BoosterCode.B);
-            double numRobots = 1 + state.getBoosterLocations(BoosterCode.C).size() + state.getNumAvailableBooster(BoosterCode.C);
+            int numExtensions = state.getGridBoosterCount(BoosterCode.B) + state.getNumAvailableBooster(BoosterCode.B);
+            double numRobots = 1 + state.getGridBoosterCount(BoosterCode.C) + state.getNumAvailableBooster(BoosterCode.C);
             extensionsPerBot = (int) Math.ceil(numExtensions / numRobots);
         }
 
@@ -68,14 +68,14 @@ public class CounterClockwiseSolverWithFallbackTarget implements Solver {
     }
     private void discoverAction(Robot robot) {        
         //install a teleport if available
-        if (state.boosterAvailable(BoosterCode.R) && canDropTeleport(robot) && USE_TELEPORT && !state.getBoosterLocations(BoosterCode.X).contains(robot.position) 
+        if (state.boosterAvailable(BoosterCode.R) && canDropTeleport(robot) && USE_TELEPORT && !state.hasSpawnPointAt(robot.position)
         && !state.getTeleportTargets().contains(robot.position)) {
             scheduleAction(R, robot);
             return;
         }
 
         //attach manipulator if we have less than the maximum (discount four for the body and starting manipulators)
-        if (state.boosterAvailable(BoosterCode.B) && robot.getManipulators().size() - 4 < extensionsPerBot) {
+        if (state.boosterAvailable(BoosterCode.B) && robot.getManipulatorCount() - 4 < extensionsPerBot) {
             scheduleAction(B, robot);
             return;
         }
@@ -87,7 +87,7 @@ public class CounterClockwiseSolverWithFallbackTarget implements Solver {
         }
 
         //use clone booster
-        if (state.boosterAvailable(BoosterCode.C) && state.getBoosterLocations(BoosterCode.X).contains(robot.position)) {
+        if (state.boosterAvailable(BoosterCode.C) && state.hasSpawnPointAt(robot.position)) {
             scheduleAction(C, robot);
             return;
         }

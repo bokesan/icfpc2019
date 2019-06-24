@@ -2,8 +2,6 @@ package icfpc2019;
 
 import org.junit.Test;
 
-import icfpc2019.pathfinder.StarNode;
-
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;

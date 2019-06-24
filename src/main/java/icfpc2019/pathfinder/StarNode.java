@@ -96,9 +96,6 @@ public class StarNode {
         return isTeleport;
     }
 
-	public void setIsDiagonaly(boolean b) {
-    }
-
     public String toString() {
         return "(" + x + "," + y + ")";
     }

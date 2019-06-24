@@ -27,10 +27,16 @@ public class Pathfinder{
         }
     }
 
+    private StarNode getNode(Point point) {
+        return nodes[point.getX()][point.getY()];
+    }
+
     private StarNode findPath(Point start, Point end) {
         openList.clear();
         closedList.clear();
-        openList.add(nodes[start.getX()][start.getY()]);
+        StarNode startNode = getNode(start);
+        StarNode endNode = getNode(end);
+        openList.add(startNode);
         for (;;) {
             StarNode current = openList.poll();
             if (current == null) {
@@ -40,59 +46,43 @@ public class Pathfinder{
             if ((current.getXPosition() == end.getX()) && (current.getYPosition() == end.getY())) {
                 return current;
             }
-            List<StarNode> adjacentNodes = getAdjacent(current);
-            for (StarNode currentAdj : adjacentNodes) {
-                if (!openList.contains(currentAdj)) {
-                    currentAdj.setPrevious(current);
-                    currentAdj.sethCosts(nodes[start.getX()][start.getY()], nodes[end.getX()][end.getY()]);
-                    currentAdj.setgCosts(current);
-                    openList.add(currentAdj);
-                } else {
-                    if (currentAdj.getgCosts() > currentAdj.calculategCosts(current)) {
-                        currentAdj.setPrevious(current);
-                        currentAdj.setgCosts(current);
-                    }
-                }
-            }
+            markAdjacent(startNode, endNode, current);
         }
     }
 
-    private ArrayList<StarNode> getAdjacent(StarNode current) {
+    private void markAdjacent(StarNode start, StarNode end, StarNode current) {
         int x = current.getXPosition();
         int y = current.getYPosition();
-        ArrayList<StarNode> adj = new ArrayList<>();
-        StarNode temp;
         if (x > 0) {
-            temp = nodes[x-1][y];
-            tryAddTempToAdjacent(adj, temp);
+            tryAdjacent(start, end, current, nodes[x-1][y]);
         }
-
         if (x < width) {
-            temp = nodes[x+1][y];
-            tryAddTempToAdjacent(adj, temp);
+            tryAdjacent(start, end, current, nodes[x+1][y]);
         }
-
         if (y > 0) {
-            temp = nodes[x][y-1];
-            tryAddTempToAdjacent(adj, temp);
+            tryAdjacent(start, end, current, nodes[x][y-1]);
         }
-
         if (y < height) {
-            temp = nodes[x][y+1];
-            tryAddTempToAdjacent(adj, temp);
+            tryAdjacent(start, end, current, nodes[x][y+1]);
         }
         for (Point p : teleporters) {
             StarNode teleporterNode = nodes[p.getX()][p.getY()];
             teleporterNode.setIsTeleport(true);
-            tryAddTempToAdjacent(adj, teleporterNode);
+            tryAdjacent(start, end, current, teleporterNode);
         }
-        return adj;
     }
 
-    private void tryAddTempToAdjacent(ArrayList<StarNode> adj, StarNode temp){
-        if (temp.isWalkable() && !closedList.contains(temp)) {
-            temp.setIsDiagonaly(false);
-            adj.add(temp);
+    private void tryAdjacent(StarNode start, StarNode end, StarNode current, StarNode adj) {
+        if (adj.isWalkable() && !closedList.contains(adj)) {
+            if (!openList.contains(adj)) {
+                adj.setPrevious(current);
+                adj.sethCosts(start, end);
+                adj.setgCosts(current);
+                openList.add(adj);
+            } else if (adj.getgCosts() > adj.calculategCosts(current)) {
+                adj.setPrevious(current);
+                adj.setgCosts(current);
+            }
         }
     }
 
@@ -120,13 +110,13 @@ public class Pathfinder{
         StarNode endNode = findPath(from, to);
         if (endNode == null)
             return 0;
-        return calcPathLength(nodes[from.getX()][from.getY()], endNode);
+        return calcPathLength(getNode(from), endNode);
     }
 
     public Collection<Point> getPath(Point from, Point to) {
         StarNode endNode = findPath(from, to);
         if (endNode == null)
             return Collections.emptyList();
-        return calcPath(nodes[from.getX()][from.getY()], endNode);
+        return calcPath(getNode(from), endNode);
     }
 }

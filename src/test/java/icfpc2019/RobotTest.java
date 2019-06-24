@@ -1,10 +1,6 @@
 package icfpc2019;
 
 import org.junit.Test;
-<<<<<<< HEAD
-=======
-
->>>>>>> d96f58be57deb8fe7887fdefdc897a6cecda000b
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;

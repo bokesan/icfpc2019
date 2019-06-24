@@ -2,10 +2,7 @@ package icfpc2019;
 
 import icfpc2019.pathfinder.DistanceMap;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 class State {
 
@@ -16,6 +13,7 @@ class State {
     private Set<Point> toVisit;
     private List<Point> telePortTargets = new ArrayList<>();
     private final DistanceMap distances;
+    private final Random random = new Random();
 
     State(Grid grid, List<BoosterLocation> boosters) {
         this.gridBoosters = boosters;
@@ -76,16 +74,26 @@ class State {
      */
     Point getNearestUnwrapped(Point target) {
         Point nearest = null;
+        Point nearest2 = null;
         int minDist = Integer.MAX_VALUE;
         distances.from(target);
         for (Point p : toVisit) {
             int dist = distances.get(p);
-            if (dist < minDist) {
-                minDist = dist;
-                nearest = p;
+            if (dist <= minDist) {
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearest = p;
+                    nearest2 = null;
+                } else if (nearest2 == null) {
+                    nearest2 = p;
+                }
             }
         }
-        return nearest;
+        if (nearest2 == null || random.nextBoolean()) {
+            return nearest;
+        } else {
+            return nearest2;
+        }
     }
 
 

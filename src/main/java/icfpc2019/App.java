@@ -34,13 +34,15 @@ public class App {
                     scores.add(safeSolveProblem(p, targetFile(p, targetDir), buyoutFile(p, targetDir)));
                 }
             }
-            try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("scores.csv")))) {
+            try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(targetDir + File.separator + "scores.csv")))) {
                 for (IdAndScore s : scores) {
                     writer.format("%d;%d\n", s.id, s.score);
                 }
             }
         } else if (args[0].equals("--show")) {
             show(args[1]);
+        } else if (args[0].equals("--random")) {
+            randomTest(args[1]);
         } else if (args.length > 2) {
             solveProblem(args[0], args[1], args[2]);
         } else if (args.length > 1) {
@@ -49,6 +51,21 @@ public class App {
             solveProblem(args[0], null, "");
         }
     }
+
+    private static void randomTest(String problemFile) {
+        int bestScore = Integer.MAX_VALUE;
+        int bestIter = 0;
+        for (int i = 1; i < 1000; i++) {
+            String solution = String.format("%s.%03d.sol", problemFile, i);
+            IdAndScore s = safeSolveProblem(problemFile, solution, "");
+            if (s.score < bestScore) {
+                bestScore = s.score;
+                bestIter = i;
+            }
+            System.out.format("%3d: %d. Best %d: %d\n", i, s.score, bestIter, bestScore);
+        }
+    }
+
 
     private static IdAndScore safeSolveProblem(String problemFile, String solutionFile, String shoppinglistFile) {
         try {

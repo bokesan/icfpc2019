@@ -172,9 +172,15 @@ public class CounterClockwiseSolverWithFallbackTarget implements Solver {
 
     private boolean hasFreeNeighbours(Point point) {
         return state.needsWrapping(point.up()) ||
+<<<<<<< HEAD
                state.needsWrapping(point.down()) ||
                state.needsWrapping(point.left()) ||
                state.needsWrapping(point.right());
+=======
+                state.needsWrapping(point.down()) ||
+                state.needsWrapping(point.left()) ||
+                state.needsWrapping(point.right());
+>>>>>>> ccd64b4730ee928174c0a6d384f2aca49149a658
     }
 
     private Point getMyFront(Robot robot) {

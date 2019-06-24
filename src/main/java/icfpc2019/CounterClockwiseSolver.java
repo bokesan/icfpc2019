@@ -43,8 +43,8 @@ public class CounterClockwiseSolver implements Solver {
     @Override
     public List<ActionSequence> solve() {
         if (DISTRIBUTE_EXTENSIONS_EVENLY) {
-            int numExtensions = state.getBoosterLocations(BoosterCode.B).size() + state.getNumAvailableBooster(BoosterCode.B);
-            double numRobots = 1 + state.getBoosterLocations(BoosterCode.C).size() + state.getNumAvailableBooster(BoosterCode.C);
+            int numExtensions = state.getGridBoosterCount(BoosterCode.B) + state.getNumAvailableBooster(BoosterCode.B);
+            double numRobots = 1 + state.getGridBoosterCount(BoosterCode.C) + state.getNumAvailableBooster(BoosterCode.C);
             extensionsPerBot = (int) Math.ceil(numExtensions / numRobots);
         }
 
@@ -66,7 +66,7 @@ public class CounterClockwiseSolver implements Solver {
         //install a teleport if available
         if (state.boosterAvailable(BoosterCode.R)
                 && USE_TELEPORT
-                && !state.getBoosterLocations(BoosterCode.X).contains(robot.position)
+                && !state.hasSpawnPointAt(robot.position)
                 && !state.isTeleportTarget(robot.position)) {
             scheduleAction(R, robot);
             return;
@@ -85,7 +85,7 @@ public class CounterClockwiseSolver implements Solver {
         }
 
         //use clone booster
-        if (state.boosterAvailable(BoosterCode.C) && state.getBoosterLocations(BoosterCode.X).contains(robot.position)) {
+        if (state.boosterAvailable(BoosterCode.C) && state.hasSpawnPointAt(robot.position)) {
             scheduleAction(C, robot);
             return;
         }

@@ -1,6 +1,6 @@
 # icfpc2019
 
-Team "" ICFP programming contest 2019 entry.
+Team "Rotten Lambdas" ICFP programming contest 2019 entry.
 
 Team members:
 
@@ -10,17 +10,27 @@ Team members:
 
 ## Building and running
 
-Run `./gradlew build` in this folder to build the application.
+Prerequisites: a Java 8 JDK.
 
-Run `./gradlew run` to execute the application.
-To pass command line arguments to the application, pass them in the `--args` argument,
-for example:
+Run `./gradlew build` in this folder to build the task solver.
 
-    ./gradlew run --args='--file="foo.json" --solver=best --who-rules=we'
+Use
 
-or
+    java -Xms2g -jar build/libs/icfpc2019.jar --target-dir solutions problems/prob-*.desc
 
-    ./gradlew run --args=$HOME/Dropbox/ICFP/2019/task/part-1/prob-001.desc
+to generate solutions for all problems in the `problems` folder and write them
+into the `solutions` folder.
 
-To build a distribution archive use `./gradlew distZip`. The resulting archive
-is placed in `build/distributions`.
+See puzzle/README.md for the description of the puzzle solver.
+
+## Our Solution approach
+
+Out task solver is written in Java. The puzzle solver is written in Haskell.
+
+We use a "hug the wall" approach and go to the nearest unwrapped field if
+nore is reachable in the next move.
+
+Teleporters are placed where found. Clones used as soon as possible and
+manipulators are attached to the sides of the existing ones.
+
+See puzzle/README.md for the description of the puzzle solver.

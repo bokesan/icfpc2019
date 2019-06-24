@@ -10,4 +10,9 @@ The generate a task for a puzzle, use
 
     stack run -- puzzle_nnn.cond > task_nnn.desc
 
+## Approach
 
+We start with a one sqaure wall along the borders of the map and
+connect all outside squares to the nearest wall. If we have too few
+vertices after that, more outside squares are randomly generated and
+connected until there are enough vertices.

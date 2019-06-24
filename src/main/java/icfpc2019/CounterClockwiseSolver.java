@@ -64,7 +64,10 @@ public class CounterClockwiseSolver implements Solver {
 
     private void discoverAction(Robot robot) {
         //install a teleport if available
-        if (state.boosterAvailable(BoosterCode.R) && USE_TELEPORT && !state.getBoosterLocations(BoosterCode.X).contains(robot.position)) {
+        if (state.boosterAvailable(BoosterCode.R)
+                && USE_TELEPORT
+                && !state.getBoosterLocations(BoosterCode.X).contains(robot.position)
+                && !state.isTeleportTarget(robot.position)) {
             scheduleAction(R, robot);
             return;
         }
@@ -166,14 +169,10 @@ public class CounterClockwiseSolver implements Solver {
     }
 
     private boolean hasFreeNeighbours(Point point) {
-        boolean trapped = true;
-        for (Point p : point.adjacent()) {
-            if (state.needsWrapping(p)) {
-                trapped = false;
-                break;
-            }
-        }
-        return !trapped;
+        return state.needsWrapping(point.up()) ||
+               state.needsWrapping(point.down()) ||
+               state.needsWrapping(point.left()) ||
+               state.needsWrapping(point.right());
     }
 
     private Point getMyFront(Robot robot) {

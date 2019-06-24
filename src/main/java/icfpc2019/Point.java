@@ -79,7 +79,4 @@ public class Point {
         return "(" + x + "," + y + ")";
     }
 
-    Point[] adjacent() {
-        return new Point[]{ up(), down(), left(), right() };
-    }
 }

@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import static icfpc2019.Action.*;
 
-public class CounterClockwiseSolver implements Solver {
+public class CounterClockwiseSolverWithFallbackTarget implements Solver {
 
     private static final boolean DISTRIBUTE_EXTENSIONS_EVENLY = true;
     private static final boolean USE_TELEPORT = true;
@@ -20,22 +20,24 @@ public class CounterClockwiseSolver implements Solver {
     private List<Robot> robots = new ArrayList<>();
     private int cutPathCounter = 0;
     private int extensionsPerBot = Integer.MAX_VALUE;
-
+    private Point middle;
     @Override
     public void init(ProblemDesc problem) {
         grid = Grid.of(problem);
+        middle = Point.of(grid.getFields().length/2, grid.getFields()[0].length/2);
         finder = new Pathfinder(grid);
         state = new State(grid, problem.getBoosters());
-        Robot robot = new Robot(problem.getInitialWorkerLocation(), false);
+        Robot robot = new Robot(problem.getInitialWorkerLocation(), true);
         robots.add(robot);
         markFieldsWrapped(robot);
     }
     @Override
     public void init(ProblemDesc problem, String shoppinglist){
         grid = Grid.of(problem);
+        middle = Point.of(grid.getFields().length/2, grid.getFields()[0].length/2);
         finder = new Pathfinder(grid);
         state = new State(grid, problem.getBoosters(), shoppinglist);
-        Robot robot = new Robot(problem.getInitialWorkerLocation(), false);
+        Robot robot = new Robot(problem.getInitialWorkerLocation(), true);
         robots.add(robot);
         markFieldsWrapped(robot);        
     }
@@ -43,8 +45,8 @@ public class CounterClockwiseSolver implements Solver {
     @Override
     public List<ActionSequence> solve() {
         if (DISTRIBUTE_EXTENSIONS_EVENLY) {
-            int numExtensions = state.getGridBoosterCount(BoosterCode.B) + state.getNumAvailableBooster(BoosterCode.B);
-            double numRobots = 1 + state.getGridBoosterCount(BoosterCode.C) + state.getNumAvailableBooster(BoosterCode.C);
+            int numExtensions = state.getBoosterLocations(BoosterCode.B).size() + state.getNumAvailableBooster(BoosterCode.B);
+            double numRobots = 1 + state.getBoosterLocations(BoosterCode.C).size() + state.getNumAvailableBooster(BoosterCode.C);
             extensionsPerBot = (int) Math.ceil(numExtensions / numRobots);
         }
 
@@ -61,13 +63,12 @@ public class CounterClockwiseSolver implements Solver {
         }
         return combineResults();
     }
-
-    private void discoverAction(Robot robot) {
+    private boolean canDropTeleport(Robot robot){
+        return middle.manhattanDistance(robot.position) <= 50;
+    }
+    private void discoverAction(Robot robot) {        
         //install a teleport if available
-        if (state.boosterAvailable(BoosterCode.R)
-                && USE_TELEPORT
-                && !state.hasSpawnPointAt(robot.position)
-                && !state.isTeleportTarget(robot.position)) {
+        if (state.boosterAvailable(BoosterCode.R) && canDropTeleport(robot) && USE_TELEPORT && !state.getBoosterLocations(BoosterCode.X).contains(robot.position)) {
             scheduleAction(R, robot);
             return;
         }
@@ -85,7 +86,7 @@ public class CounterClockwiseSolver implements Solver {
         }
 
         //use clone booster
-        if (state.boosterAvailable(BoosterCode.C) && state.hasSpawnPointAt(robot.position)) {
+        if (state.boosterAvailable(BoosterCode.C) && state.getBoosterLocations(BoosterCode.X).contains(robot.position)) {
             scheduleAction(C, robot);
             return;
         }
@@ -96,17 +97,17 @@ public class CounterClockwiseSolver implements Solver {
             return;
         }
 
-        //collect teleporter
-        if (state.mapHasBooster(BoosterCode.R)) {
+        if (robot.isBoosterCollector() && state.mapHasBooster(BoosterCode.R)) {
             collectBooster(robot, BoosterCode.R);
             return;
         }
 
         //collect manipulator
-        if (state.mapHasBooster(BoosterCode.B)) {
+        if (robot.isBoosterCollector() && state.mapHasBooster(BoosterCode.B)) {
             collectBooster(robot, BoosterCode.B);
-            return;
+            return;            
         }
+        
 
         //fill that connected area
         //if all adjacent fields are filled, break
@@ -169,10 +170,14 @@ public class CounterClockwiseSolver implements Solver {
     }
 
     private boolean hasFreeNeighbours(Point point) {
-        return state.needsWrapping(point.up()) ||
-               state.needsWrapping(point.down()) ||
-               state.needsWrapping(point.left()) ||
-               state.needsWrapping(point.right());
+        boolean trapped = true;
+        for (Point p : point.adjacent()) {
+            if (state.needsWrapping(p)) {
+                trapped = false;
+                break;
+            }
+        }
+        return !trapped;
     }
 
     private Point getMyFront(Robot robot) {
@@ -199,12 +204,17 @@ public class CounterClockwiseSolver implements Solver {
 
     private void setupStartLocation(Robot robot) {
         //find the nearest empty field
-        Point best = state.getNearestUnwrapped(robot.position);
+        Point best = state.getNearestUnwrapped(robot.position);        
         if (best == null) {
             //we are done, yay!
             return;
         }
-
+        //if a robot picks the target of another robot... get furthest point available.
+        Point search = best;
+        if(robots.size() > 1 && robots.stream().anyMatch(r -> !r.equals(robot) && r.getTarget() != null && r.getTarget().equals(search))){
+            best = state.getFurthestUnwrapped(robot.position, best);            
+        }
+        robot.setTarget(best);
         Collection<Point> path = finder.getPath(robot.position, best);
         moveUntilFree(robot, path);
     }

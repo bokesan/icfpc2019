@@ -45,10 +45,24 @@ class State {
     /**
      * Get unwrapped point nearest to the target by manhattan distance.
      */
+    Point getFurthestUnwrapped(Point target, Point exclude) {
+        Point furthest = null;
+        int minDist = 0;
+        for (Point p : toVisit) {
+            if(exclude != null && p.equals(exclude) && toVisit.size() != 1)
+                 continue;
+            int dist = target.manhattanDistance(p);
+            if (dist > minDist) {
+                minDist = dist;
+                furthest = p;
+            }
+        }
+        return furthest;
+    }
     Point getNearestUnwrapped(Point target) {
         Point nearest = null;
         int minDist = Integer.MAX_VALUE;
-        for (Point p : toVisit) {
+        for (Point p : toVisit) {           
             int dist = target.manhattanDistance(p);
             if (dist < minDist) {
                 minDist = dist;

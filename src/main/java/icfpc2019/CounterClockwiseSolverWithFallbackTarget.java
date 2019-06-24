@@ -3,6 +3,7 @@ package icfpc2019;
 import icfpc2019.pathfinder.Pathfinder;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,12 +20,12 @@ public class CounterClockwiseSolverWithFallbackTarget implements Solver {
     private List<Robot> robots = new ArrayList<>();
     private int cutPathCounter = 0;
     private int extensionsPerBot = Integer.MAX_VALUE;
-
+    private Point middle;
     @Override
     public void init(ProblemDesc problem) {
         grid = Grid.of(problem);
-        finder = new Pathfinder();
-        finder.initNodes(grid);
+        middle = Point.of(grid.getFields().length/2, grid.getFields()[0].length/2);
+        finder = new Pathfinder(grid);
         state = new State(grid, problem.getBoosters());
         Robot robot = new Robot(problem.getInitialWorkerLocation(), true);
         robots.add(robot);
@@ -33,8 +34,8 @@ public class CounterClockwiseSolverWithFallbackTarget implements Solver {
     @Override
     public void init(ProblemDesc problem, String shoppinglist){
         grid = Grid.of(problem);
-        finder = new Pathfinder();
-        finder.initNodes(grid);
+        middle = Point.of(grid.getFields().length/2, grid.getFields()[0].length/2);
+        finder = new Pathfinder(grid);
         state = new State(grid, problem.getBoosters(), shoppinglist);
         Robot robot = new Robot(problem.getInitialWorkerLocation(), true);
         robots.add(robot);
@@ -62,10 +63,12 @@ public class CounterClockwiseSolverWithFallbackTarget implements Solver {
         }
         return combineResults();
     }
-
-    private void discoverAction(Robot robot) {
+    private boolean canDropTeleport(Robot robot){
+        return middle.manhattanDistance(robot.position) <= 50;
+    }
+    private void discoverAction(Robot robot) {        
         //install a teleport if available
-        if (state.boosterAvailable(BoosterCode.R) && USE_TELEPORT && !state.getBoosterLocations(BoosterCode.X).contains(robot.position)) {
+        if (state.boosterAvailable(BoosterCode.R) && canDropTeleport(robot) && USE_TELEPORT && !state.getBoosterLocations(BoosterCode.X).contains(robot.position)) {
             scheduleAction(R, robot);
             return;
         }
@@ -94,11 +97,17 @@ public class CounterClockwiseSolverWithFallbackTarget implements Solver {
             return;
         }
 
+        if (robot.isBoosterCollector() && state.mapHasBooster(BoosterCode.R)) {
+            collectBooster(robot, BoosterCode.R);
+            return;
+        }
+
         //collect manipulator
         if (robot.isBoosterCollector() && state.mapHasBooster(BoosterCode.B)) {
             collectBooster(robot, BoosterCode.B);
-            return;
+            return;            
         }
+        
 
         //fill that connected area
         //if all adjacent fields are filled, break
@@ -202,15 +211,15 @@ public class CounterClockwiseSolverWithFallbackTarget implements Solver {
         }
         //if a robot picks the target of another robot... get furthest point available.
         Point search = best;
-        // if(robots.size() > 1 && robots.stream().anyMatch(r -> !r.equals(robot) && r.getTarget() != null && r.getTarget().equals(search))){
-        //     best = state.getFurthestUnwrapped(robot.position, best);            
-        // }
-        // robot.setTarget(best);
-        List<Point> path = finder.getPath(robot.position, best);
+        if(robots.size() > 1 && robots.stream().anyMatch(r -> !r.equals(robot) && r.getTarget() != null && r.getTarget().equals(search))){
+            best = state.getFurthestUnwrapped(robot.position, best);            
+        }
+        robot.setTarget(best);
+        Collection<Point> path = finder.getPath(robot.position, best);
         moveUntilFree(robot, path);
     }
 
-    private void moveUntilFree(Robot robot, List<Point> path) {
+    private void moveUntilFree(Robot robot, Collection<Point> path) {
         int maxLength = 20 + cutPathCounter;
         int steps = 0;
         Point from = robot.position;
@@ -230,7 +239,7 @@ public class CounterClockwiseSolverWithFallbackTarget implements Solver {
     }
 
     private void moveUntilThere(Robot robot, Point target) {
-        List<Point> path = finder.getPath(robot.position, target);
+        Collection<Point> path = finder.getPath(robot.position, target);
         Point from = robot.position;
         for (Point p : path) {
             from = move(robot, from, p);

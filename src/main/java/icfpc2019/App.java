@@ -56,7 +56,7 @@ public class App {
         String shoppingList = getShoppinglist(shoppingListFile);
         ProblemDesc problem = ProblemDesc.of(desc);
         System.out.format("Starting solver for %s ...\n", problemFile);
-        Solver solver = new CounterClockwiseSolver();
+        Solver solver = new CounterClockwiseSolverWithFallbackTarget();
         if(shoppingList.length() > 0)
             solver.init(problem, shoppingList);
         else

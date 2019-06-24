@@ -26,7 +26,7 @@ public class CounterClockwiseSolver implements Solver {
         grid = Grid.of(problem);
         finder = new Pathfinder(grid);
         state = new State(grid, problem.getBoosters());
-        Robot robot = new Robot(problem.getInitialWorkerLocation());
+        Robot robot = new Robot(problem.getInitialWorkerLocation(), false);
         robots.add(robot);
         markFieldsWrapped(robot);
     }
@@ -35,7 +35,7 @@ public class CounterClockwiseSolver implements Solver {
         grid = Grid.of(problem);
         finder = new Pathfinder(grid);
         state = new State(grid, problem.getBoosters(), shoppinglist);
-        Robot robot = new Robot(problem.getInitialWorkerLocation());
+        Robot robot = new Robot(problem.getInitialWorkerLocation(), false);
         robots.add(robot);
         markFieldsWrapped(robot);        
     }

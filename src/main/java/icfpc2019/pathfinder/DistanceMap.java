@@ -24,6 +24,8 @@ public class DistanceMap {
 
     private final int[][] distance;
 
+    private final ArrayDeque<QueueEntry> queue = new ArrayDeque<>();
+
     public DistanceMap(Grid grid) {
         this.grid = grid;
         this.width = grid.getWidth();
@@ -33,7 +35,6 @@ public class DistanceMap {
 
     public void from(Point point) {
         clear();
-        ArrayDeque<QueueEntry> queue = new ArrayDeque<>();
         queue.push(new QueueEntry(point, 0));
         set(point, 0);
         for (;;) {
@@ -41,15 +42,16 @@ public class DistanceMap {
             if (p == null)
                 break;
             if (grid.isFree(p.point)) {
-                check(queue, p.point.up(), p.dist + 1);
-                check(queue, p.point.down(), p.dist + 1);
-                check(queue, p.point.left(), p.dist + 1);
-                check(queue, p.point.right(), p.dist + 1);
+                int nd = p.dist + 1;
+                check(p.point.up(), nd);
+                check(p.point.down(), nd);
+                check(p.point.left(), nd);
+                check(p.point.right(), nd);
             }
         }
     }
 
-    private void check(ArrayDeque<QueueEntry> queue, Point p, int dist) {
+    private void check(Point p, int dist) {
         if (!grid.isFree(p)) {
             return;
         }
@@ -74,6 +76,7 @@ public class DistanceMap {
         for (int[] col : distance) {
             Arrays.fill(col, -1);
         }
+        queue.clear();
     }
 
     private void set(Point p, int value) {

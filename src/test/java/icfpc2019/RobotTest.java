@@ -1,7 +1,6 @@
 package icfpc2019;
 
 import org.junit.Test;
-
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;

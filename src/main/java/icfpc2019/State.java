@@ -1,6 +1,7 @@
 package icfpc2019;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -42,14 +43,15 @@ class State {
         toVisit.remove(p);
     }
 
-    /**
-     * Get unwrapped point nearest to the target by manhattan distance.
-     */
     Point getFurthestUnwrapped(Point target, Point exclude) {
         Point furthest = null;
         int minDist = 0;
+        if (toVisit.size() == 1) {
+            // make sure we still get a result
+            exclude = null;
+        }
         for (Point p : toVisit) {
-            if(exclude != null && p.equals(exclude) && toVisit.size() != 1)
+            if (p.equals(exclude))
                  continue;
             int dist = target.manhattanDistance(p);
             if (dist > minDist) {
@@ -59,6 +61,10 @@ class State {
         }
         return furthest;
     }
+
+    /**
+     * Get unwrapped point nearest to the target by manhattan distance.
+     */
     Point getNearestUnwrapped(Point target) {
         Point nearest = null;
         int minDist = Integer.MAX_VALUE;
@@ -74,10 +80,11 @@ class State {
 
 
     void pickBoosterUp(Point position) {
-        for (BoosterLocation booster : gridBoosters) {
+        for (Iterator<BoosterLocation> it = gridBoosters.iterator(); it.hasNext(); ) {
+            BoosterLocation booster = it.next();
             if (booster.getBoosterCode() != BoosterCode.X && booster.getPoint().equals(position)) {
                 tooHotBoosters.add(booster.getBoosterCode());
-                gridBoosters.remove(booster);
+                it.remove();
                 break;
             }
         }
@@ -126,8 +133,8 @@ class State {
     }
 
     void removeBooster(BoosterCode b) {
-        if (!availableBoosters.contains(b)) throw new RuntimeException("Booster not available: " + b.name());
-        availableBoosters.remove(b);
+        if (!availableBoosters.remove(b))
+            throw new RuntimeException("Booster not available: " + b.name());
     }
 
     void coolBoosterDown() {

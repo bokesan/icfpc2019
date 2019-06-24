@@ -12,7 +12,7 @@ The generate a task for a puzzle, use
 
 ## Approach
 
-We start with a one sqaure wall along the borders of the map and
+We start with a one square wide wall along the borders of the map and
 connect all outside squares to the nearest wall. If we have too few
 vertices after that, more outside squares are randomly generated and
 connected until there are enough vertices.

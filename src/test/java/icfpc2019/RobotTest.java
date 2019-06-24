@@ -14,7 +14,7 @@ public class RobotTest {
     @Test
     public void testNew() {
         Point p = Point.of(10, 20);
-        Robot r = new Robot(p);
+        Robot r = new Robot(p, true);
         // a new robot should face east
         assertEquals(p, r.position);
         Collection<Point> man = r.getManipulators();
@@ -29,7 +29,7 @@ public class RobotTest {
     public void testMoveRight() {        
         Point p = Point.of(10, 20);        
         Point p1 = p.right();
-        Robot r = new Robot(p);
+        Robot r = new Robot(p,true);
         r.singleStep(Action.D);
         // a new robot should face east
         assertEquals(p1, r.position);

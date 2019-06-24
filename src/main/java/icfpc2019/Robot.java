@@ -7,15 +7,18 @@ import java.util.List;
 public class Robot {
 
     Point position;
+    private Point target;
     Direction direction;
     private List<Point> manipulators;
     private final ActionSequence log = new ActionSequence();
     private int fastWheelUnits = 0;
     private int drillUnits = 0;
     private List<Action> toDoList = new ArrayList<>();
+    private boolean isBoosterCollector = false;
 
-    public Robot(Point position) {
+    public Robot(Point position, boolean isBoosterCollector) {
         this.position = position;
+        this.isBoosterCollector = isBoosterCollector;
         manipulators = new ArrayList<>();
         initBaseManipulators();
         direction = Direction.EAST;
@@ -122,15 +125,25 @@ public class Robot {
     }
 
     Robot cloneBot() {
-        Robot newBot = new Robot(position);
+        Robot newBot = new Robot(position, false);
         log.append(Action.C);
         countTimeUnit();
         return newBot;
+    }
+    
+    boolean isBoosterCollector(){
+        return this.isBoosterCollector;
     }
 
     void addTeleporter() {
         log.append(Action.R);
         countTimeUnit();
+    }
+    void setTarget(Point p){
+        this.target = p;
+    }
+    Point getTarget(){
+        return this.target;
     }
 
     public void teleport(Action action) {

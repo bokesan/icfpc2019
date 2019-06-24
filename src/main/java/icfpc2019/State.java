@@ -34,6 +34,10 @@ class State {
         return boughtItems;
     }
 
+    List<Point> getTeleportTargets(){
+        return this.telePortTargets;
+    }
+
     boolean mapFinished() {
         return toVisit.isEmpty();
     }

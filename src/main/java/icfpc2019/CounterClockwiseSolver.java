@@ -3,6 +3,7 @@ package icfpc2019;
 import icfpc2019.pathfinder.Pathfinder;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,8 +24,7 @@ public class CounterClockwiseSolver implements Solver {
     @Override
     public void init(ProblemDesc problem) {
         grid = Grid.of(problem);
-        finder = new Pathfinder();
-        finder.initNodes(grid);
+        finder = new Pathfinder(grid);
         state = new State(grid, problem.getBoosters());
         Robot robot = new Robot(problem.getInitialWorkerLocation());
         robots.add(robot);
@@ -33,8 +33,7 @@ public class CounterClockwiseSolver implements Solver {
     @Override
     public void init(ProblemDesc problem, String shoppinglist){
         grid = Grid.of(problem);
-        finder = new Pathfinder();
-        finder.initNodes(grid);
+        finder = new Pathfinder(grid);
         state = new State(grid, problem.getBoosters(), shoppinglist);
         Robot robot = new Robot(problem.getInitialWorkerLocation());
         robots.add(robot);
@@ -91,6 +90,12 @@ public class CounterClockwiseSolver implements Solver {
         //got to mystery platform
         if (state.boosterAvailable(BoosterCode.C) && state.mapHasBooster(BoosterCode.X)) {
             collectBooster(robot, BoosterCode.X);
+            return;
+        }
+
+        //collect teleporter
+        if (state.mapHasBooster(BoosterCode.R)) {
+            collectBooster(robot, BoosterCode.R);
             return;
         }
 
@@ -201,11 +206,11 @@ public class CounterClockwiseSolver implements Solver {
             return;
         }
 
-        List<Point> path = finder.getPath(robot.position, best);
+        Collection<Point> path = finder.getPath(robot.position, best);
         moveUntilFree(robot, path);
     }
 
-    private void moveUntilFree(Robot robot, List<Point> path) {
+    private void moveUntilFree(Robot robot, Collection<Point> path) {
         int maxLength = 20 + cutPathCounter;
         int steps = 0;
         Point from = robot.position;
@@ -225,7 +230,7 @@ public class CounterClockwiseSolver implements Solver {
     }
 
     private void moveUntilThere(Robot robot, Point target) {
-        List<Point> path = finder.getPath(robot.position, target);
+        Collection<Point> path = finder.getPath(robot.position, target);
         Point from = robot.position;
         for (Point p : path) {
             from = move(robot, from, p);

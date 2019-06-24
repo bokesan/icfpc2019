@@ -4,8 +4,8 @@ package icfpc2019.pathfinder;
 import icfpc2019.Point;
 
 public class StarNode {
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
     private StarNode previous;
     private double gCosts;
     private double hCosts;
@@ -35,8 +35,8 @@ public class StarNode {
 
     //uses euclidean distance
 	public void sethCosts(StarNode starNode) {
-        int dx = absolute(this.getXPosition() - starNode.getXPosition());
-        int dy = absolute(this.getYPosition() - starNode.getYPosition());
+        int dx = Math.abs(this.getXPosition() - starNode.getXPosition());
+        int dy = Math.abs(this.getYPosition() - starNode.getYPosition());
         this.hCosts = (int) (BASICMOVEMENTCOST * Math.sqrt(dx * dx + dy * dy));
     }
 
@@ -45,7 +45,7 @@ public class StarNode {
         int dy1 = this.getYPosition() - goal.getYPosition();
         int dx2 = start.getXPosition() - goal.getXPosition();
         int dy2 = start.getYPosition() - goal.getYPosition();
-        int cross = absolute(dx1*dy2 - dx2*dy1);
+        int cross = Math.abs(dx1*dy2 - dx2*dy1);
         this.hCosts += cross*0.001;
     }
 
@@ -94,13 +94,6 @@ public class StarNode {
 
     public boolean isTeleport(){
         return isTeleport;
-    }
-
-	public void setIsDiagonaly(boolean b) {
-    }
-    
-    private int absolute(int a) {
-        return a > 0 ? a : -a;
     }
 
     public String toString() {

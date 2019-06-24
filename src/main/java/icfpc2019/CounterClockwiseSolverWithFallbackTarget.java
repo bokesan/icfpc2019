@@ -17,7 +17,7 @@ public class CounterClockwiseSolverWithFallbackTarget implements Solver {
     private Pathfinder finder;
     private Grid grid;
     private State state;
-    private List<Robot> robots = new ArrayList<>();
+    private List<Robot> robots = new ArrayList<>();    
     private int cutPathCounter = 0;
     private int extensionsPerBot = Integer.MAX_VALUE;
     private Point middle;
@@ -64,11 +64,12 @@ public class CounterClockwiseSolverWithFallbackTarget implements Solver {
         return combineResults();
     }
     private boolean canDropTeleport(Robot robot){
-        return middle.manhattanDistance(robot.position) <= 50;
+        return middle.manhattanDistance(robot.position) <= middle.getX()/2 && state.getTeleportTargets().stream().allMatch(t -> t.manhattanDistance(robot.position) >= 50);
     }
     private void discoverAction(Robot robot) {        
         //install a teleport if available
-        if (state.boosterAvailable(BoosterCode.R) && canDropTeleport(robot) && USE_TELEPORT && !state.getBoosterLocations(BoosterCode.X).contains(robot.position)) {
+        if (state.boosterAvailable(BoosterCode.R) && canDropTeleport(robot) && USE_TELEPORT && !state.getBoosterLocations(BoosterCode.X).contains(robot.position) 
+        && !state.getTeleportTargets().contains(robot.position)) {
             scheduleAction(R, robot);
             return;
         }
@@ -299,7 +300,7 @@ public class CounterClockwiseSolverWithFallbackTarget implements Solver {
                     break;
             default: throw new RuntimeException("Action not implemented: " + action.toString());
         }
-    }
+    }    
 
     private void attachManipulator(Robot robot) {
         List<Point> manipulators = robot.getManipulators();

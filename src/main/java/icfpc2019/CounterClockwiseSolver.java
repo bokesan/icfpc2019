@@ -3,6 +3,7 @@ package icfpc2019;
 import icfpc2019.pathfinder.Pathfinder;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -201,11 +202,11 @@ public class CounterClockwiseSolver implements Solver {
             return;
         }
 
-        List<Point> path = finder.getPath(robot.position, best);
+        Collection<Point> path = finder.getPath(robot.position, best);
         moveUntilFree(robot, path);
     }
 
-    private void moveUntilFree(Robot robot, List<Point> path) {
+    private void moveUntilFree(Robot robot, Collection<Point> path) {
         int maxLength = 20 + cutPathCounter;
         int steps = 0;
         Point from = robot.position;
@@ -225,7 +226,7 @@ public class CounterClockwiseSolver implements Solver {
     }
 
     private void moveUntilThere(Robot robot, Point target) {
-        List<Point> path = finder.getPath(robot.position, target);
+        Collection<Point> path = finder.getPath(robot.position, target);
         Point from = robot.position;
         for (Point p : path) {
             from = move(robot, from, p);

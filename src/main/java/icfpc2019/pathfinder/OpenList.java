@@ -11,9 +11,9 @@ public class OpenList {
         public int compare(StarNode a, StarNode b) {
             int r = Double.compare(a.getfCosts(), b.getfCosts());
             if (r != 0) return r;
-            r = Double.compare(a.getXPosition(), b.getXPosition());
+            r = Integer.compare(a.getXPosition(), b.getXPosition());
             if (r != 0) return r;
-            return Double.compare(a.getYPosition(), b.getYPosition());
+            return Integer.compare(a.getYPosition(), b.getYPosition());
         }
     }
 

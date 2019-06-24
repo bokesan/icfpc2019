@@ -3,7 +3,7 @@ package icfpc2019.pathfinder;
 
 import icfpc2019.Point;
 
-public class StarNode {
+class StarNode {
     private final int x;
     private final int y;
     private StarNode previous;

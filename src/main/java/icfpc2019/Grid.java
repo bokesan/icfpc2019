@@ -15,6 +15,14 @@ public class Grid {
         this.max = max;
     }
 
+    public int getWidth() {
+        return max.getX();
+    }
+
+    public int getHeight() {
+        return max.getY();
+    }
+
     public static Grid of(ProblemDesc problemDesc) {
         boolean[][] fields = new boolean[problemDesc.getMax().getX()][problemDesc.getMax().getY()];
         setSquares(fields, problemDesc.getMap(), problemDesc.getObstacles());

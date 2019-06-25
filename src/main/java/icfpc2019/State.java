@@ -1,9 +1,8 @@
 package icfpc2019;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import icfpc2019.pathfinder.DistanceMap;
+
+import java.util.*;
 
 class State {
 
@@ -13,10 +12,13 @@ class State {
     private List<BoosterCode> tooHotBoosters = new ArrayList<>();
     private Set<Point> toVisit;
     private List<Point> telePortTargets = new ArrayList<>();
+    private final DistanceMap distances;
+    private final Random random = new Random();
 
     State(Grid grid, List<BoosterLocation> boosters) {
         this.gridBoosters = boosters;
         this.toVisit = grid.getFreeSquares();
+        this.distances = new DistanceMap(grid);
     }
     State(Grid grid, List<BoosterLocation> boosters, String shoppingList){
         this(grid, boosters);
@@ -50,6 +52,7 @@ class State {
     Point getFurthestUnwrapped(Point target, Point exclude) {
         Point furthest = null;
         int minDist = 0;
+        distances.from(target);
         if (toVisit.size() == 1) {
             // make sure we still get a result
             exclude = null;
@@ -57,7 +60,7 @@ class State {
         for (Point p : toVisit) {
             if (p.equals(exclude))
                  continue;
-            int dist = target.manhattanDistance(p);
+            int dist = distances.get(p);
             if (dist > minDist) {
                 minDist = dist;
                 furthest = p;
@@ -67,19 +70,30 @@ class State {
     }
 
     /**
-     * Get unwrapped point nearest to the target by manhattan distance.
+     * Get unwrapped point nearest to the target.
      */
     Point getNearestUnwrapped(Point target) {
         Point nearest = null;
+        Point nearest2 = null;
         int minDist = Integer.MAX_VALUE;
-        for (Point p : toVisit) {           
-            int dist = target.manhattanDistance(p);
-            if (dist < minDist) {
-                minDist = dist;
-                nearest = p;
+        distances.from(target);
+        for (Point p : toVisit) {
+            int dist = distances.get(p);
+            if (dist <= minDist) {
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearest = p;
+                    nearest2 = null;
+                } else if (nearest2 == null) {
+                    nearest2 = p;
+                }
             }
         }
-        return nearest;
+        if (nearest2 == null || random.nextBoolean()) {
+            return nearest;
+        } else {
+            return nearest2;
+        }
     }
 
 

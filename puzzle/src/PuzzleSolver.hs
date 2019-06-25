@@ -15,8 +15,8 @@ solvePuzzle puzzle = fmap (fillTask puzzle) $ go start (oSqs puzzle)
     start = border (tSize puzzle)
     go grid []     = Just grid
     go grid (o:os) = case grow puzzle grid (nearestTo grid o) o of
-                       [] -> Nothing
-                       (g:_) -> go g os
+                       Nothing -> Nothing
+                       Just g -> go g os
                        
 fillTask :: Puzzle -> Grid -> (Task, Grid)
 fillTask puzzle grid = let map' = wallsToPoly grid'
@@ -60,8 +60,8 @@ complicate puzzle grid = go rng grid
                            go rng'' g
                         else
                            case grow puzzle g (nearestTo g p) p of
-                             [] -> go rng'' g
-                             (g':_) -> go rng'' g'
+                             Nothing -> go rng'' g
+                             Just g' -> go rng'' g'
     
 
 border :: Int -> Grid
@@ -76,13 +76,16 @@ nearestTo grid point = snd (minimum [(distanceSquared p point, p) | p <- allWall
 
 -- grow puzzle grid src dest
 --  grow walls from existing wall src to and including dest
-grow :: Puzzle -> Grid -> Point -> Point -> [Grid]
+grow :: Puzzle -> Grid -> Point -> Point -> Maybe Grid
 grow puzzle grid src dest
-  | src == dest = [grid]
-  | otherwise   = let ns = [p | p <- neighbors src, isFree grid p, p `notElem` iSqs puzzle]
-                      ans = map snd (sort [(manhattanDistance p dest, p) | p <- ns])
-                  in concat [grow puzzle (addWall grid p) p dest | p <- ans]
+  | src == dest = Just grid
+  | otherwise   = let ans = sort [(manhattanDistance dest p, p) | p <- neighbors src, isFree grid p, p `notElem` iSqs puzzle]
+                  in firstJust [grow puzzle (addWall grid p) p dest | (_,p) <- ans]
 
+firstJust :: [Maybe a] -> Maybe a
+firstJust (x@(Just _) : _) = x
+firstJust (Nothing : xs) = firstJust xs
+firstJust [] = Nothing
 
 allOpen :: Grid -> [Point]
 allOpen grid = [Point x y | x <- [0 .. maxX], y <- [0 .. maxY], isFree grid (Point x y)]

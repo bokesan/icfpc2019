@@ -13,10 +13,13 @@ fromWalls ps = Grid (maxX,maxY) (fromList ps)
     maxY = maximum [y | Point _ y <- ps]
 
 isWall :: Grid -> Point -> Bool
-isWall grid point = member point (walls grid)
+isWall grid p = member p (walls grid)
 
 isFree :: Grid -> Point -> Bool
-isFree g = not . isWall g
+isFree grid p = not (isWall grid p) && inBounds grid p
+
+inBounds :: Grid -> Point -> Bool
+inBounds Grid{maxBounds = (w,h)} (Point x y) = x >= 0 && y >= 0 && x <= w && y <= h
 
 allWalls :: Grid -> [Point]
 allWalls grid = toList (walls grid)
@@ -32,5 +35,5 @@ instance Show Grid where
                     in showGrid maxY
 
 addWall :: Grid -> Point -> Grid
-addWall grid point = grid{walls = insert point (walls grid)}
-
+addWall grid p | inBounds grid p = grid{walls = insert p (walls grid)}
+               | otherwise = error ("point outside grid: " ++ show p)

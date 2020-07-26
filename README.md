@@ -29,12 +29,12 @@ Out task solver is written in Java. The puzzle solver is written in Haskell.
 
 We use a "hug the wall" approach and go to the nearest unwrapped field if
 nore is reachable in the next move. Manipulators are attached at one side only,
-to maximize the reacht into the field when following walls or already wrapped fields.
+to maximize the reach into the field when following walls or already wrapped fields.
 
 Teleporters are placed near the center of the map but with a minimum distance from each other.
 An A* algorithm treats teleporter fields as adjacent to all other fields.
-Clones used as soon as possible and manipulators are distributed evenly and attached to the sides of the existing ones.
-The first robot is a dedicated collector of boosters and will first take care ofgetting everything valuable.
+Clones are used as soon as possible and manipulators are distributed evenly and attached to the sides of the existing ones.
+The first robot is a dedicated collector of boosters and will first take care of getting everything valuable.
 Spawned replicas go to work immediately.
 Drills and wheels are ignored, they offered to little advantages over other features.
 
